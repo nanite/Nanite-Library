@@ -1,0 +1,35 @@
+{
+    "schemaVersion": 1,
+    "id": "${mod_id}",
+    "version": "${mod_version}",
+    "name": "${mod_name}",
+    "description": "Template",
+    "authors": [
+        "${mod_author}"
+    ],
+    "contact": {
+        "homepage": "https://github.com/errormikey/no-a-repo",
+        "sources": "https://github.com/errormikey/no-a-repo"
+    },
+    "license": "MPL-2",
+    "icon": "assets/modid/icon.png",
+    "environment": "*",
+    "entrypoints": {
+        "main": [
+            "dev.nanite.nanitelibrary.fabric.NaniteLibraryFabric"
+        ],
+        "fabric-datagen": [
+            "dev.nanite.nanitelibrary.fabric.datagen.NaniteLibraryDataGen"
+        ]
+    },
+    "mixins": [
+        "nanitelibrary.mixins.json",
+        "nanitelibrary.fabric.mixins.json"
+    ],
+    "depends": {
+        "fabricloader": ">=0.14",
+        "fabric": "*",
+        "minecraft": ">=1.20",
+        "java": ">=17"
+    }
+}
