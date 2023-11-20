@@ -17,6 +17,7 @@ plugins {
 }
 
 rootProject.name = 'nanite-library-1.20.1'
+include("standard")
 include("common")
 include("fabric")
 include("neo")
