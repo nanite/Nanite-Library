@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "testfabric",
+  "version": "0.0.1",
+  "name": "Test Fabric",
+  "description": "Go away ",
+  "authors": [
+    "Nanite Team"
+  ],
+  "contact": {
+    "homepage": "https://github.com/errormikey/no-a-repo",
+    "sources": "https://github.com/errormikey/no-a-repo"
+  },
+  "license": "MPL-2",
+  "icon": "assets/modid/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "dev.nanite.testfabric.TestFabricMod"
+    ]
+  },
+  "mixins": [],
+  "depends": {
+    "fabricloader": ">=0.14",
+    "fabric": "*",
+    "minecraft": ">=1.20",
+    "java": ">=17"
+  }
+}

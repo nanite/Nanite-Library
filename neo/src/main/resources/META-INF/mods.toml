@@ -1,5 +1,5 @@
 modLoader="javafml" #mandatory
-loaderVersion="[47,)" #mandatory
+loaderVersion="[1,)" #mandatory
 license="MPL-2"
 
 [[mods]]
@@ -12,15 +12,21 @@ Deescription
 '''
 
 [[dependencies.${mod_id}]]
-    modId="forge"
+    modId="neoforge"
     mandatory=true
-    versionRange="[47.1,)"
+    versionRange="[20.2,)"
     ordering="NONE"
     side="BOTH"
 
 [[dependencies.${mod_id}]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.20,1.21)"
+    versionRange="[1.20.2,1.20.3)"
     ordering="NONE"
     side="BOTH"
+
+[[mixins]]
+config="${mod_id}.mixins.json"
+
+[[mixins]]
+config="${mod_id}.neo.mixins.json"

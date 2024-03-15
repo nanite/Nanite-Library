@@ -7,6 +7,8 @@ import dev.nanite.nanitelibrary.platform.services.IPlatformHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.Registry;
 
+import java.nio.file.Path;
+
 public class FabricPlatformHelper implements IPlatformHelper {
     private static final FabricWeirdness WEIRDNESS = new FabricWeirdness();
 
@@ -29,6 +31,11 @@ public class FabricPlatformHelper implements IPlatformHelper {
     public boolean isModLoaded(String modId) {
 
         return FabricLoader.getInstance().isModLoaded(modId);
+    }
+
+    @Override
+    public Path gamePath() {
+        return FabricLoader.getInstance().getGameDir();
     }
 
     @Override

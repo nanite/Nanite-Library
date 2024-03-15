@@ -1,0 +1,74 @@
+plugins {
+    id 'fabric-loom' version '1.5-SNAPSHOT'
+
+}
+
+version = "0.0.1"
+group = "dev.nanite.testfabric"
+
+base {
+    archivesName = "nanite-testfabric"
+}
+
+
+loom {
+    runs {
+        configureEach {
+            ideConfigGenerated = true
+            setConfigName("Test Fabric ${it.name}")
+        }
+    }
+
+    mods {
+        "testfabric" {
+            sourceSet sourceSets.main
+        }
+    }
+}
+
+repositories {
+    maven {
+        name = "Modrinth"
+        url = "https://api.modrinth.com/maven"
+        content {
+            includeGroup("maven.modrinth")
+        }
+    }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${minecraft_version}"
+    mappings loom.officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
+
+    modRuntimeOnly "maven.modrinth:modmenu:9.0.0"
+
+    api project(path: ":common", configuration: "namedElements")
+    api project(path: ":fabric", configuration: "namedElements") transitive(false)
+}
+
+processResources {
+    inputs.property "version", project.version
+
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.release = 17
+}
+
+java {
+    withSourcesJar()
+
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+jar {
+    from("LICENSE") {
+        rename { "${it}_${project.base.archivesName.get()}"}
+    }
+}

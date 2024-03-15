@@ -1,0 +1,26 @@
+modLoader="javafml" #mandatory
+loaderVersion="[1,)" #mandatory
+license="MPL-2"
+
+[[mods]]
+modId="testforge"
+version="0.0.1"
+displayName="Nanite Team" #mandatory
+authors="Nanite Team" #optional
+description='''
+    Deescription
+'''
+
+[[dependencies.testforge]]
+    modId="forge"
+    mandatory=true
+    versionRange="[38.0,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.testforge]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.20.2,1.20.3)"
+    ordering="NONE"
+    side="BOTH"

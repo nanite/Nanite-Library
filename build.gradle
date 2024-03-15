@@ -1,18 +1,26 @@
 plugins {
-    id 'fabric-loom' version '1.3-SNAPSHOT' apply(false)
-    id 'net.neoforged.gradle' version '[6.0.18,6.2)' apply(false)
+    id 'fabric-loom' version '1.5-SNAPSHOT' apply(false)
     id "org.spongepowered.mixin" version "${mixin_version}" apply(false)
-    id "me.modmuss50.mod-publish-plugin" version "0.3.0"
+    id "me.modmuss50.mod-publish-plugin" version "0.4.5"
+    id 'net.neoforged.gradle.userdev' version '7.0.97' apply(false)
 }
 
 ext.isSnapshot = true//providers.environmentVariable("SNAPSHOT").map { it == "true" }.getOrElse(false)
 
 allprojects {
     version = "${mod_version}+mc${minecraft_version}${isSnapshot ? '-SNAPSHOT' : ''}"
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven {
+            url "https://maven.saps.dev/mirror"
+        }
+    }
 }
 
 subprojects {
-    if (project.name == "standard") {
+    if (project.name == "standard" || project.name.startsWith("test-")) {
         return
     }
 
@@ -52,10 +60,6 @@ subprojects {
         }
     }
 
-    repositories {
-        mavenCentral()
-    }
-
     tasks.withType(JavaCompile).configureEach {
 
         it.options.encoding = 'UTF-8'
@@ -87,26 +91,6 @@ subprojects {
 //                    }
 //                }
 //            }
-        }
-    }
-
-    if (project.name != "common") {
-        tasks.withType(JavaCompile).configureEach {
-            if (!it.name.toLowerCase().contains("test")) {
-                source(project(":common").sourceSets.main.allSource)
-            }
-        }
-
-        tasks.withType(Javadoc).configureEach {
-            source(project(":common").sourceSets.main.allJava)
-        }
-
-        tasks.named("sourcesJar", Jar) {
-            from(project(":common").sourceSets.main.allSource)
-        }
-
-        processResources {
-            from project(":common").sourceSets.main.resources
         }
     }
 }

@@ -8,17 +8,10 @@ dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
     mappings loom.officialMojangMappings()
     compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.5'
-    compileOnly project(":standard")
+//    compileOnly project(":standard")
 }
 
 sourceSets.main.resources { srcDir 'src/main/generated/resources' }
-
-repositories {
-    maven {
-        name = 'Creeperhost'
-        url = 'https://maven.creeperhost.net/'
-    }
-}
 
 loom {
     if (project(":common").file("src/main/resources/${mod_id}.accesswidener").exists()) {

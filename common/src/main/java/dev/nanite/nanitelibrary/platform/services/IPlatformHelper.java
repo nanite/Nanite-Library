@@ -4,6 +4,8 @@ import dev.nanite.nanitelibrary.core.registry.NaniteRegistry;
 import dev.nanite.nanitelibrary.platform.Weirdness;
 import net.minecraft.core.Registry;
 
+import java.nio.file.Path;
+
 public interface IPlatformHelper {
     <T> NaniteRegistry<T> createRegistry(String modId, Registry<T> backingRegistry);
 
@@ -23,6 +25,8 @@ public interface IPlatformHelper {
      * @return True if the mod is loaded, false otherwise.
      */
     boolean isModLoaded(String modId);
+
+    Path gamePath();
 
     /**
      * Check if the game is currently in a development environment.

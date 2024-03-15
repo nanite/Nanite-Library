@@ -5,8 +5,10 @@ import dev.nanite.nanitelibrary.neo.core.registry.NeoRegistry;
 import dev.nanite.nanitelibrary.platform.Weirdness;
 import dev.nanite.nanitelibrary.platform.services.IPlatformHelper;
 import net.minecraft.core.Registry;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.loading.FMLLoader;
+import net.neoforged.fml.ModList;
+import net.neoforged.fml.loading.FMLLoader;
+
+import java.nio.file.Path;
 
 public class NeoPlatformHelper implements IPlatformHelper {
     private static final NeoWeirdness WEIRDNESS = new NeoWeirdness();
@@ -28,8 +30,12 @@ public class NeoPlatformHelper implements IPlatformHelper {
 
     @Override
     public boolean isModLoaded(String modId) {
-
         return ModList.get().isLoaded(modId);
+    }
+
+    @Override
+    public Path gamePath() {
+        return FMLLoader.getGamePath();
     }
 
     @Override
