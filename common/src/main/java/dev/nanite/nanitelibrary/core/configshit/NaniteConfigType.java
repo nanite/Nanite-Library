@@ -1,4 +1,4 @@
-package dev.nanite.nanitelibrary.core.config;
+package dev.nanite.nanitelibrary.core.configshit;
 
 import net.minecraft.resources.ResourceLocation;
 

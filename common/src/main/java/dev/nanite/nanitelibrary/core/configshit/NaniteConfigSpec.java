@@ -1,20 +1,30 @@
-package dev.nanite.nanitelibrary.core.config;
+package dev.nanite.nanitelibrary.core.configshit;
 
+import com.electronwill.nightconfig.core.CommentedConfig;
+import com.electronwill.nightconfig.core.Config;
+import com.electronwill.nightconfig.toml.TomlFormat;
+import com.electronwill.nightconfig.toml.TomlParser;
+import com.electronwill.nightconfig.toml.TomlWriter;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import dev.nanite.nanitelibrary.core.config.NaniteConfigManager;
 import dev.nanite.nanitelibrary.platform.Services;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A config spec that holds a collection of config values and provides a way to load and save them
  */
 public class NaniteConfigSpec {
     private static final Gson GSON = new Gson().newBuilder().setPrettyPrinting().create();
+    private static final TomlFormat TOML = TomlFormat.instance();
 
     // We care about the order of the config so we use a linked hashmap
     private final String name;
@@ -23,8 +33,7 @@ public class NaniteConfigSpec {
     public NaniteConfigSpec(String name) {
         this.name = name;
     }
-
-    public <T> NaniteConfigValue<T> define(String name, T defaultValue, String[] comments) {
+    public <T> NaniteConfigValue<T> define(String name, T defaultValue, String... comments) {
         NaniteConfigValue<T> value = new NaniteConfigValue<>(this, name, defaultValue, comments);
         valueMap.put(name, value);
         return value;
@@ -48,27 +57,33 @@ public class NaniteConfigSpec {
 
     public void load() throws IOException {
         var configManager = NaniteConfigManager.INSTANCE;
-        var location = Services.PLATFORM.gamePath().resolve("config/" + name + ".json"); // Not sure about json yet, likely won't be json
+        var location = Services.PLATFORM.gamePath().resolve("config/" + name + ".toml"); // Not sure about json yet, likely won't be json
+
+        if(!Files.exists(location)){
+            invalidate();
+            save();
+            return;
+        }
 
         // Load the config from the file
         String configData = Files.readString(location);
 
-        // Parse the config data and populate the values
-        var data = GSON.fromJson(configData, JsonArray.class);
-
-        // Because we write in a nested fashion but read in a flat fashion, we need to flatten the config as we read it
-        var flatConfig = walkJsonStructure(data);
-
-        // Populate the values
-        for (var entry : flatConfig.entrySet()) {
+        TomlParser parser = TOML.createParser();
+        CommentedConfig parsedConfig = parser.parse(configData);
+        Set<? extends CommentedConfig.Entry> entries = parsedConfig.entrySet();
+//        // Parse the config data and populate the values
+//        var data = GSON.fromJson(configData, JsonArray.class);
+//
+//        // Because we write in a nested fashion but read in a flat fashion, we need to flatten the config as we read it
+//        var flatConfig = walkJsonStructure(data);
+//
+//        // Populate the values
+        for (var entry : entries) {
             var key = entry.getKey();
-            var value = entry.getValue();
             if (valueMap.containsKey(key)) {
-                valueMap.get(key).populate(value);
+                valueMap.get(key).populate(entry);
             }
         }
-
-
     }
 
     /**
@@ -115,8 +130,15 @@ public class NaniteConfigSpec {
         return flatConfig;
     }
 
-    public void save() {
-        //
+    public void save() throws IOException {
+        Config c = Config.inMemory();
+        for (Map.Entry<String, NaniteConfigValue<?>> valueEntry : valueMap.entrySet()) {
+            c.set(valueEntry.getKey(), valueEntry.getValue().get());
+        }
+        TomlWriter tomlWriter = TOML.createWriter();
+        String outputConfig = tomlWriter.writeToString(c);
+        var location = Services.PLATFORM.gamePath().resolve("config/" + name + ".toml");
+        Files.writeString(location, outputConfig, StandardOpenOption.WRITE);
     }
 }
 

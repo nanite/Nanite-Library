@@ -45,7 +45,7 @@ dependencies {
     modRuntimeOnly "maven.modrinth:modmenu:9.0.0"
 
     api project(path: ":common", configuration: "namedElements")
-    api project(path: ":fabric", configuration: "namedElements") transitive(false)
+    api project(path: ":fabric", configuration: "namedElements")
 }
 
 processResources {

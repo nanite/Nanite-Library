@@ -1,48 +1,60 @@
 package dev.nanite.nanitelibrary.core.config;
 
-import com.google.gson.JsonElement;
+public class NaniteConfigValue<T> {
 
-import java.util.function.Supplier;
-
-/**
- * Holder for a config value
- */
-public class NaniteConfigValue<T> implements Supplier<T> {
-    private final NaniteConfigSpec container;
-
-    private final String name;
-    private final T defaultValue;
-    private final String[] comments;
-
-    private boolean invalidated;
     private T value;
+    private final String path;
+    private final T defaultValue;
+    private boolean invalidated;
 
-    public NaniteConfigValue(NaniteConfigSpec container, String name, T defaultValue, String[] comments) {
-        this.container = container;
-        this.name = name;
+    private final NaniteConfig naniteConfig;
+
+    private NaniteConfigValue(NaniteConfig naniteConfig, String path, T defaultValue){
+        this.naniteConfig = naniteConfig;
+        this.path = path;
         this.defaultValue = defaultValue;
-        this.comments = comments;
+        this.invalidated = true;
+        naniteConfig.registerValue(this);
     }
 
-    @Override
-    public T get() {
-        if (this.invalidated) {
-            this.value = this.container.get(this.name, this.defaultValue);
-            this.invalidated = false;
-        }
+    public String getPath(){
+        return this.path;
+    }
 
+    public T getValue(){
+        if(invalidated){
+            this.value = naniteConfig.get(path, defaultValue);
+            invalidated = false;
+        }
         return this.value;
     }
 
-    /**
-     * Allows the config system to populate the value upon load
-     * @param value The value to populate with
-     */
-    protected void populate(JsonElement value) {
-        this.value = null;
+    public void invalidate(){
+        this.invalidated = true;
     }
 
-    public void invalidate() {
-        this.invalidated = false;
+    public static class Builder<T> {
+        private final NaniteConfig naniteConfig;
+        private String path;
+        private T defaultValue;
+
+        public Builder(NaniteConfig parent){
+            this.naniteConfig = parent;
+        }
+
+        public Builder<T> defaultValue(T defaultValue){
+            this.defaultValue = defaultValue;
+            return this;
+        }
+
+        public Builder<T> path(String path){
+            this.path = path;
+            return this;
+        }
+
+        public NaniteConfigValue<T> build(){
+            return new NaniteConfigValue<>(naniteConfig, path, defaultValue);
+        }
     }
+
 }

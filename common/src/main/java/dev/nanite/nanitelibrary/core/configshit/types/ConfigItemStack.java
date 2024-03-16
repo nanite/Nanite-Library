@@ -1,9 +1,9 @@
-package dev.nanite.nanitelibrary.core.config.types;
+package dev.nanite.nanitelibrary.core.configshit.types;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import dev.nanite.nanitelibrary.core.config.NaniteConfigLifecycleContext;
-import dev.nanite.nanitelibrary.core.config.NaniteConfigLifecycles;
-import dev.nanite.nanitelibrary.core.config.NaniteConfigType;
+import dev.nanite.nanitelibrary.core.configshit.NaniteConfigLifecycleContext;
+import dev.nanite.nanitelibrary.core.configshit.NaniteConfigLifecycles;
+import dev.nanite.nanitelibrary.core.configshit.NaniteConfigType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.resources.ResourceLocation;

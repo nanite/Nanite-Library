@@ -1,5 +1,8 @@
 package dev.nanite.nanitelibrary.forge;
 
+import dev.nanite.nanitelibrary.core.registry.reload.NaniteReloadListenerManager;
+import net.minecraft.server.packs.resources.PreparableReloadListener;
+import net.minecraftforge.event.AddReloadListenerEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import net.minecraftforge.common.MinecraftForge;
@@ -26,6 +29,14 @@ public class NaniteLibraryForge {
 
     private void commonSetup(final FMLCommonSetupEvent event) {
 
+    }
+
+    @SubscribeEvent
+    private void onAddReloadListener(AddReloadListenerEvent event){
+        LOGGER.debug("Registering reload listeners");
+        for (PreparableReloadListener listener : NaniteReloadListenerManager.INSTANCE.stream().toList()) {
+            event.addListener(listener);
+        }
     }
 
     @SubscribeEvent

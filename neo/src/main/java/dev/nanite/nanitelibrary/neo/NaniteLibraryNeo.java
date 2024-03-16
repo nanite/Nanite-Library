@@ -1,9 +1,11 @@
 package dev.nanite.nanitelibrary.neo;
 
 import dev.nanite.nanitelibrary.NaniteLibrary;
+import dev.nanite.nanitelibrary.core.registry.reload.NaniteReloadListenerManager;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
@@ -14,6 +16,7 @@ import net.neoforged.neoforge.capabilities.ItemCapability;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.energy.EnergyStorage;
+import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import org.slf4j.Logger;
@@ -37,6 +40,14 @@ public class NaniteLibraryNeo {
 
     private void commonSetup(final FMLCommonSetupEvent event) {
 
+    }
+
+    @SubscribeEvent
+    private void onAddReloadListener(AddReloadListenerEvent event){
+        LOGGER.debug("Registering reload listeners");
+        for (PreparableReloadListener listener : NaniteReloadListenerManager.INSTANCE.stream().toList()) {
+            event.addListener(listener);
+        }
     }
 
 
