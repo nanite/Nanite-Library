@@ -4,17 +4,27 @@ public class NaniteConfigValue<T> {
 
     private T value;
     private final String path;
+    private final String comment;
     private final T defaultValue;
     private boolean invalidated;
 
     private final NaniteConfig naniteConfig;
 
-    private NaniteConfigValue(NaniteConfig naniteConfig, String path, T defaultValue){
+    private NaniteConfigValue(NaniteConfig naniteConfig, String path, T defaultValue, String comment){
         this.naniteConfig = naniteConfig;
         this.path = path;
         this.defaultValue = defaultValue;
         this.invalidated = true;
+        this.comment = comment;
         naniteConfig.registerValue(this);
+    }
+
+    protected boolean hasComment(){
+        return this.comment != null;
+    }
+
+    protected String getComment(){
+        return this.comment;
     }
 
     public String getPath(){
@@ -36,6 +46,7 @@ public class NaniteConfigValue<T> {
     public static class Builder<T> {
         private final NaniteConfig naniteConfig;
         private String path;
+        private String comment;
         private T defaultValue;
 
         public Builder(NaniteConfig parent){
@@ -52,8 +63,13 @@ public class NaniteConfigValue<T> {
             return this;
         }
 
+        public Builder<T> comment(String comment){
+            this.comment = comment;
+            return this;
+        }
+
         public NaniteConfigValue<T> build(){
-            return new NaniteConfigValue<>(naniteConfig, path, defaultValue);
+            return new NaniteConfigValue<>(naniteConfig, path, defaultValue, comment);
         }
     }
 

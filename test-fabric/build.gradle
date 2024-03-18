@@ -43,7 +43,7 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
 
     modRuntimeOnly "maven.modrinth:modmenu:9.0.0"
-
+    implementation('com.electronwill.night-config:toml:3.6.0')
     api project(path: ":common", configuration: "namedElements")
     api project(path: ":fabric", configuration: "namedElements")
 }

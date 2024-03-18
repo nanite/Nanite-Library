@@ -24,7 +24,7 @@ public class NaniteLibraryFabric implements ModInitializer {
     public void onInitialize() {
         NaniteLibrary.init();
         LOGGER.debug("Registering reload listeners");
-        for (Map.Entry<ResourceLocation, PreparableReloadListener> entry : NaniteReloadListenerManager.INSTANCE.getListeners().entrySet()) {
+        for (Map.Entry<ResourceLocation, PreparableReloadListener> entry : NaniteReloadListenerManager.INSTANCE.getListeners(NaniteReloadListenerManager.ReloadType.SERVER).entrySet()) {
             ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(new IdentifiableResourceReloadListener() {
                 @Override
                 public ResourceLocation getFabricId() {

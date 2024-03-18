@@ -34,7 +34,7 @@ public class NaniteLibraryForge {
     @SubscribeEvent
     private void onAddReloadListener(AddReloadListenerEvent event){
         LOGGER.debug("Registering reload listeners");
-        for (PreparableReloadListener listener : NaniteReloadListenerManager.INSTANCE.stream().toList()) {
+        for (PreparableReloadListener listener : NaniteReloadListenerManager.INSTANCE.stream(NaniteReloadListenerManager.ReloadType.SERVER).toList()) {
             event.addListener(listener);
         }
     }

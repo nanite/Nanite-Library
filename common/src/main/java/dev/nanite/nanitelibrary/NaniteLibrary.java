@@ -14,10 +14,11 @@ import java.util.concurrent.Executor;
 public class NaniteLibrary {
     public static void init() {
         NaniteCreativeTab.REGISTRY.initialize();
-        NaniteReloadListenerManager.INSTANCE.registerListener(new ResourceLocation(Constants.MOD_ID, "config-reloader"),
+        NaniteReloadListenerManager.INSTANCE.registerListener(NaniteReloadListenerManager.ReloadType.SERVER,
+                new ResourceLocation(Constants.MOD_ID, "config-reloader"),
                 (preparationBarrier, resourceManager, profilerFiller, profilerFiller2, executor, executor2) -> {
             NaniteConfigManager.INSTANCE.reloadAll();
-            return CompletableFuture.completedFuture(null);
+            return preparationBarrier.wait(null);
         });
     }
 }

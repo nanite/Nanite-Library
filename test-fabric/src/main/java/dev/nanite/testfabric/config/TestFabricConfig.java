@@ -13,9 +13,9 @@ public class TestFabricConfig {
 
     public TestFabricConfig() {
         naniteConfig = new NaniteConfig.Builder().name("nanite-test-config").build();
-        testString = naniteConfig.newStringProperty("testString", "Default Value!");
-        intConfig = naniteConfig.newIntegerProperty("testInteger", 0);
-        serverPlayerCount = naniteConfig.newIntegerProperty("server.players.maxCount", 20);
+        testString = naniteConfig.newStringProperty("testString", "Default Value!", "A test string");
+        intConfig = naniteConfig.newIntegerProperty("testInteger", 0, "A test integer");
+        serverPlayerCount = naniteConfig.newIntegerProperty("server.players.maxCount", 20, "Test value for max amount of players on server");
     }
 
     public NaniteConfig getNaniteConfig() {

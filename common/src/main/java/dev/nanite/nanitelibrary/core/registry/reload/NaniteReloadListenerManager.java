@@ -13,17 +13,28 @@ public enum NaniteReloadListenerManager {
 
     INSTANCE;
 
-    private Map<ResourceLocation, PreparableReloadListener> listeners = new HashMap<>();
+    private final Map<ResourceLocation, PreparableReloadListener> serverListeners = new HashMap<>();
+    private final Map<ResourceLocation, PreparableReloadListener> clientListeners = new HashMap<>();
 
-    public void registerListener(ResourceLocation id, PreparableReloadListener reloadListener){
-        listeners.put(id, reloadListener);
+    public void registerListener(ReloadType reloadType, ResourceLocation id, PreparableReloadListener reloadListener){
+        if(reloadType == ReloadType.CLIENT){
+            clientListeners.put(id, reloadListener);
+        } else {
+            serverListeners.put(id, reloadListener);
+        }
     }
 
-    public Map<ResourceLocation, PreparableReloadListener> getListeners(){
-        return this.listeners;
+    public Map<ResourceLocation, PreparableReloadListener> getListeners(ReloadType reloadType){
+        return reloadType == ReloadType.CLIENT ? clientListeners : serverListeners;
     }
 
-    public Stream<PreparableReloadListener> stream(){
-        return this.listeners.values().stream();
+    public Stream<PreparableReloadListener> stream(ReloadType reloadType){
+        Map<ResourceLocation, PreparableReloadListener> listeners = reloadType == ReloadType.CLIENT ? clientListeners : serverListeners;
+        return listeners.values().stream();
+    }
+
+    public enum ReloadType {
+        CLIENT,
+        SERVER;
     }
 }

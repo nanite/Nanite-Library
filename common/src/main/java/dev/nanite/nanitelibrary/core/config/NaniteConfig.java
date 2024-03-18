@@ -6,6 +6,7 @@ import com.electronwill.nightconfig.core.io.WritingMode;
 import com.electronwill.nightconfig.toml.TomlFormat;
 import com.google.common.base.Preconditions;
 import dev.nanite.nanitelibrary.platform.Services;
+import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -42,6 +43,9 @@ public class NaniteConfig {
         for (NaniteConfigValue<?> configValue : configValues) {
             if(!backingConfig.contains(configValue.getPath())){
                 backingConfig.set(configValue.getPath(), configValue.getValue());
+                if(configValue.hasComment()) {
+                    backingConfig.setComment(configValue.getPath(), configValue.getComment());
+                }
                 shouldSave = true;
             }
         }
@@ -69,20 +73,24 @@ public class NaniteConfig {
         return new NaniteConfigValue.Builder<>(this);
     }
 
-    public NaniteConfigValue<String> newStringProperty(String path, String defaultValue){
-        return new NaniteConfigValue.Builder<String>(this).path(path).defaultValue(defaultValue).build();
+    public NaniteConfigValue<String> newStringProperty(String path, String defaultValue, @Nullable String comment){
+        return new NaniteConfigValue.Builder<String>(this).path(path).defaultValue(defaultValue).comment(comment).build();
     }
 
-    public NaniteConfigValue<Float> newFloatProperty(String path, float defaultValue){
-        return new NaniteConfigValue.Builder<Float>(this).path(path).defaultValue(defaultValue).build();
+    public NaniteConfigValue<Float> newFloatProperty(String path, float defaultValue, @Nullable String comment){
+        return new NaniteConfigValue.Builder<Float>(this).path(path).defaultValue(defaultValue).comment(comment).build();
     }
 
-    public NaniteConfigValue<Integer> newIntegerProperty(String path, int defaultValue){
-        return new NaniteConfigValue.Builder<Integer>(this).path(path).defaultValue(defaultValue).build();
+    public NaniteConfigValue<Integer> newIntegerProperty(String path, int defaultValue, @Nullable String comment){
+        return new NaniteConfigValue.Builder<Integer>(this).path(path).defaultValue(defaultValue).comment(comment).build();
     }
 
-    public NaniteConfigValue<Double> newDoubleProperty(String path, double defaultValue){
-        return new NaniteConfigValue.Builder<Double>(this).path(path).defaultValue(defaultValue).build();
+    public NaniteConfigValue<Double> newDoubleProperty(String path, double defaultValue, @Nullable String comment){
+        return new NaniteConfigValue.Builder<Double>(this).path(path).defaultValue(defaultValue).comment(comment).build();
+    }
+
+    public NaniteConfigValue<Boolean> newBooleanProperty(String path, boolean defaultValue, @Nullable String comment){
+        return new NaniteConfigValue.Builder<Boolean>(this).path(path).defaultValue(defaultValue).comment(comment).build();
     }
 
     public static class Builder {

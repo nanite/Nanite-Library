@@ -11,9 +11,9 @@ public class TestNeoForgeConfig {
 
     public TestNeoForgeConfig() {
         naniteConfig = new NaniteConfig.Builder().name("nanite-test-config").build();
-        testString = naniteConfig.newStringProperty("testString", "Default Value!");
-        intConfig = naniteConfig.newIntegerProperty("testInteger", 0);
-        serverPlayerCount = naniteConfig.newIntegerProperty("server.players.maxCount", 20);
+        testString = naniteConfig.newStringProperty("testString", "Default Value!", "Test String");
+        intConfig = naniteConfig.newIntegerProperty("testInteger", 0, "Test Integer");
+        serverPlayerCount = naniteConfig.newIntegerProperty("server.players.maxCount", 20, "Test integer for max server count");
     }
 
     public NaniteConfig getNaniteConfig() {
