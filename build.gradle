@@ -1,10 +1,10 @@
 plugins {
     id 'java-library'
-    id 'fabric-loom' version '1.11-SNAPSHOT' apply(false)
-    id 'net.neoforged.moddev' version '2.0.112' apply(false)
-    id "me.modmuss50.mod-publish-plugin" version "1.0.0"
+    id 'fabric-loom' version '1.15-SNAPSHOT' apply(false)
+    id 'net.neoforged.moddev' version '2.0.141' apply(false)
+    id "me.modmuss50.mod-publish-plugin" version "1.1.0"
+    id 'pro.mikey.plugins.insaniam' version "0.1-SNAPSHOT"
 }
-
 
 ext.isSnapshot = true//providers.environmentVariable("SNAPSHOT").map { it == "true" }.getOrElse(false)
 
@@ -13,20 +13,20 @@ allprojects {
     apply plugin: 'java-library'
     apply plugin: 'maven-publish'
 
-    version = "${mod_version}${isSnapshot ? '-SNAPSHOT' : ''}"
-    java.toolchain.languageVersion = JavaLanguageVersion.of(21)
-
-    repositories {
-        mavenLocal()
-        mavenCentral()
-    }
+    version = mod_version
+    group = maven_group
 
     tasks.withType(JavaCompile).configureEach {
         options.encoding = 'UTF-8'
+        options.release = 25
+    }
+
+    repositories {
+        mavenCentral()
     }
 
     dependencies {
-        testImplementation platform('org.junit:junit-bom:5.10.3')
+//        testImplementation platform('org.junit:junit-bom:5.10.3')
     }
 
     idea {
@@ -38,18 +38,18 @@ allprojects {
 }
 
 subprojects {
+    base {
+        archivesName = "${archives_base_name}-$project.name"
+    }
+
     if (project.name == "standard") {
         return
     }
 
-    base {
-        archivesName = "${mod_name.replaceAll(" ", "-").toLowerCase()}-${project.name}"
-    }
-
-    if (project.name != "common" && project.name != "standard") {
+    if (project.name != "common") {
         dependencies {
             api project(":common")
-            api project(":standard")
+            api project(path: ":standard", configuration: "loomExportedClasspath")
         }
 
         jar {
@@ -58,51 +58,44 @@ subprojects {
         }
     }
 
-    java.withSourcesJar()
-
-//    jar {
-//        from(rootProject.file("LICENSE")) {
-//            rename { "${it}_${mod_name}" }
-//        }
-//        manifest {
-//            attributes([
-//                    'Specification-Title'     : mod_name,
-//                    'Specification-Vendor'    : mod_author,
-//                    'Specification-Version'   : project.jar.archiveVersion,
-//                    'Implementation-Title'    : project.name,
-//                    'Implementation-Version'  : project.jar.archiveVersion,
-//                    'Implementation-Vendor'   : mod_author,
-//                    'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-//                    'Timestamp'               : System.currentTimeMillis(),
-//                    'Built-On-Java'           : "${System.getProperty('java.vm.version')} (${System.getProperty('java.vm.vendor')})",
-//                    'Built-On-Minecraft'      : minecraft_version
-//            ])
-//        }
-//    }
-
-    sourcesJar {
-        from(rootProject.file("LICENSE")) {
-            rename { "${it}_${mod_name}" }
-        }
-    }
+    def replaceProperties = [
+            mod_id: mod_id,
+            mod_name: mod_name,
+            mod_author: mod_author,
+            minecraft_version: minecraft_version,
+            neoforge_version: neoforge_version,
+            fabric_loader_version: fabric_loader_version,
+            fabric_api_version: fabric_api_version,
+            version: version,
+    ]
 
     processResources {
-        filesMatching(['pack.mcmeta', 'fabric.mod.json', 'META-INF/neoforge.mods.toml', 'neoforge.mods.toml', '*.mixins.json']) {
-            expand project.properties
+        inputs.properties replaceProperties
+
+        filesMatching(["META-INF/neoforge.mods.toml", "fabric.mod.json", "pack.mcmeta"]) {
+            expand replaceProperties
         }
     }
 
     publishing {
+        publications {
+            register("maven${project.name.capitalize()}", MavenPublication) {
+                artifactId = "${rootProject.archives_base_name}-${project.name}"
+                from components.java
+            }
+        }
+
         repositories {
-//            if (providers.environmentVariable("MAVEN_TOKEN").orNull) {
-//                maven {
-//                    url "${maven_url}${isSnapshot ? 'snapshots' : 'releases'}"
-//                    credentials {
-//                        username = "admin"
-//                        password = providers.environmentVariable("MAVEN_TOKEN").get()
-//                    }
-//                }
-//            }
+            def token = providers.environmentVariable("NANITE_TOKEN");
+            if (token.isPresent()) {
+                maven {
+                    url "https://maven.nanite.dev/releases"
+                    credentials {
+                        username = "nanite"
+                        password = providers.environmentVariable("NANITE_TOKEN").get()
+                    }
+                }
+            }
         }
     }
 }

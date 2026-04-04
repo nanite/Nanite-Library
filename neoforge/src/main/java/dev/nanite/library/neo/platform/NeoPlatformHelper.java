@@ -6,7 +6,9 @@ import dev.nanite.library.platform.Weirdness;
 import dev.nanite.library.platform.services.IPlatformHelper;
 import net.minecraft.core.Registry;
 import net.neoforged.fml.ModList;
+import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.fml.loading.FMLLoader;
+import net.neoforged.fml.loading.FMLPaths;
 
 import java.nio.file.Path;
 
@@ -35,12 +37,12 @@ public class NeoPlatformHelper implements IPlatformHelper {
 
     @Override
     public Path gamePath() {
-        return FMLLoader.getGamePath();
+        return FMLPaths.GAMEDIR.get();
     }
 
     @Override
     public boolean isDevelopmentEnvironment() {
 
-        return !FMLLoader.isProduction();
+        return !FMLEnvironment.isProduction();
     }
 }

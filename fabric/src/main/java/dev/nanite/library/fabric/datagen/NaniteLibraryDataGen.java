@@ -2,7 +2,7 @@ package dev.nanite.library.fabric.datagen;
 
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider;
 import net.minecraft.core.HolderLookup;
 
@@ -16,9 +16,8 @@ public class NaniteLibraryDataGen implements DataGeneratorEntrypoint {
     }
 
     private static class Lang extends FabricLanguageProvider {
-
-        protected Lang(FabricDataOutput dataOutput, CompletableFuture<HolderLookup.Provider> registryLookup) {
-            super(dataOutput, registryLookup);
+        protected Lang(FabricPackOutput packOutput, CompletableFuture<HolderLookup.Provider> registryLookup) {
+            super(packOutput, registryLookup);
         }
 
         @Override

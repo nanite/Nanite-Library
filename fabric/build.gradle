@@ -1,15 +1,8 @@
 plugins {
-    id 'fabric-loom'
+    id 'net.fabricmc.fabric-loom'
 }
 
-dependencies {
-    minecraft "com.mojang:minecraft:${minecraft_version}"
-
-    mappings loom.officialMojangMappings()
-    modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
-
-    include(implementation("de.marhali:json5-java:3.0.0"))
+fabricApi {
 }
 
 loom {
@@ -19,26 +12,9 @@ loom {
         useLegacyMixinAp = false
     }
 
-    mods {
-        "nanitelibrary" {
-            sourceSet sourceSets.main
-            sourceSet("main", project(":common"))
-            sourceSet("main", project(":standard"))
-        }
-    }
-
     runs {
-        client {
-            client()
-            setConfigName("Fabric Client")
-            ideConfigGenerated(true)
-            runDir("run")
-        }
-        server {
-            server()
-            setConfigName("Fabric Server")
-            ideConfigGenerated(true)
-            runDir("run")
+        configureEach {
+            ideConfigGenerated = true
         }
 
         datagenClient {
@@ -51,13 +27,25 @@ loom {
             runDir "build/datagen"
         }
     }
-}
 
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            artifactId base.archivesName.get()
-            from components.java
+    mods {
+        "${mod_id}" {
+            sourceSet sourceSets.main
+            sourceSet("main", ":common")
+            sourceSet("main", project(":standard"))
         }
     }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+
+    implementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+
+    include(implementation("de.marhali:json5-java:3.0.0"))
+}
+
+java {
+    withSourcesJar()
 }

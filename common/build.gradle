@@ -1,19 +1,6 @@
 plugins {
-    id 'fabric-loom'
+    id 'net.fabricmc.fabric-loom'
 }
-
-dependencies {
-    minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings loom.officialMojangMappings()
-
-    testImplementation platform('org.junit:junit-bom:5.10.3')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
-
-    implementation project(":standard")
-    implementation("de.marhali:json5-java:3.0.0")
-}
-
-sourceSets.main.resources { srcDir 'src/main/generated/resources' }
 
 loom {
     accessWidenerPath.set(file("src/main/resources/${mod_id}.accesswidener"))
@@ -23,17 +10,22 @@ loom {
     }
 }
 
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+
+//    testImplementation platform('org.junit:junit-bom:5.10.3')
+//    testImplementation 'org.junit.jupiter:junit-jupiter'
+
+    compileOnly group: 'net.fabricmc', name: 'sponge-mixin', version: '0.17.0+mixin.0.8.7'
+    compileOnly "io.github.llamalad7:mixinextras-fabric:0.5.0"
+
+    implementation project(":standard")
+    implementation("de.marhali:json5-java:3.0.0")
+}
+
+// TODO: this might not be needed anymore.
 jar {
     manifest {
         attributes.put("Fabric-Loom-Remap", "false")
-    }
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            artifactId base.archivesName.get()
-            from components.java
-        }
     }
 }

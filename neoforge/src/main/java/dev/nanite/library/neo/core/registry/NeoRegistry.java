@@ -5,7 +5,7 @@ import dev.nanite.library.core.registry.NaniteRegistry;
 import dev.nanite.library.core.registry.RegistryHolder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -33,7 +33,7 @@ public class NeoRegistry<T> implements NaniteRegistry<T> {
 
     @Override
     public RegistryHolder<T> register(String id, Supplier<T> value) {
-        NeoRegistryHolder<T> holder = new NeoRegistryHolder<>(ResourceLocation.fromNamespaceAndPath(this.modId, id), registry.register(id, value));
+        NeoRegistryHolder<T> holder = new NeoRegistryHolder<>(Identifier.fromNamespaceAndPath(this.modId, id), registry.register(id, value));
         entries.add(holder);
         return holder;
     }

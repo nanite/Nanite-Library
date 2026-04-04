@@ -8,7 +8,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.AddReloadListenerEvent;
+//import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,13 +30,13 @@ public class NaniteLibraryNeo {
 
     }
 
-    @SubscribeEvent
-    private void onAddReloadListener(AddReloadListenerEvent event){
-        LOGGER.debug("Registering reload listeners");
-        for (PreparableReloadListener listener : NaniteReloadListenerManager.INSTANCE.stream(NaniteReloadListenerManager.ReloadType.SERVER).toList()) {
-            event.addListener(listener);
-        }
-    }
+//    @SubscribeEvent
+//    private void onAddReloadListener(AddReloadListenerEvent event){
+//        LOGGER.debug("Registering reload listeners");
+//        for (PreparableReloadListener listener : NaniteReloadListenerManager.INSTANCE.stream(NaniteReloadListenerManager.ReloadType.SERVER).toList()) {
+//            event.addListener(listener);
+//        }
+//    }
 
 
     @SubscribeEvent
