@@ -1,58 +1,84 @@
 plugins {
-    id 'fabric-loom' version '1.5-SNAPSHOT' apply(false)
-    id "org.spongepowered.mixin" version "${mixin_version}" apply(false)
-    id "me.modmuss50.mod-publish-plugin" version "0.4.5"
-    id 'net.neoforged.gradle.userdev' version '7.0.97' apply(false)
+    id 'java-library'
+    id 'fabric-loom' version '1.11-SNAPSHOT' apply(false)
+    id 'net.neoforged.moddev' version '2.0.112' apply(false)
+    id "me.modmuss50.mod-publish-plugin" version "1.0.0"
 }
+
 
 ext.isSnapshot = true//providers.environmentVariable("SNAPSHOT").map { it == "true" }.getOrElse(false)
 
 allprojects {
-    version = "${mod_version}+mc${minecraft_version}${isSnapshot ? '-SNAPSHOT' : ''}"
+    apply plugin: 'idea'
+    apply plugin: 'java-library'
+    apply plugin: 'maven-publish'
+
+    version = "${mod_version}${isSnapshot ? '-SNAPSHOT' : ''}"
+    java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
     repositories {
         mavenLocal()
         mavenCentral()
-        maven {
-            url "https://maven.saps.dev/mirror"
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
+    }
+
+    dependencies {
+        testImplementation platform('org.junit:junit-bom:5.10.3')
+    }
+
+    idea {
+        module {
+            downloadSources = true
+            downloadJavadoc = true
         }
     }
 }
 
 subprojects {
-    if (project.name == "standard" || project.name.startsWith("test-")) {
+    if (project.name == "standard") {
         return
     }
-
-    apply plugin: 'java'
-    apply plugin: 'maven-publish'
 
     base {
         archivesName = "${mod_name.replaceAll(" ", "-").toLowerCase()}-${project.name}"
     }
 
-    java.toolchain.languageVersion = JavaLanguageVersion.of(17)
-    java.withSourcesJar()
-
-    jar {
-        from(rootProject.file("LICENSE")) {
-            rename { "${it}_${mod_name}" }
+    if (project.name != "common" && project.name != "standard") {
+        dependencies {
+            api project(":common")
+            api project(":standard")
         }
-        manifest {
-            attributes([
-                    'Specification-Title'     : mod_name,
-                    'Specification-Vendor'    : mod_author,
-                    'Specification-Version'   : project.jar.archiveVersion,
-                    'Implementation-Title'    : project.name,
-                    'Implementation-Version'  : project.jar.archiveVersion,
-                    'Implementation-Vendor'   : mod_author,
-                    'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-                    'Timestamp'               : System.currentTimeMillis(),
-                    'Built-On-Java'           : "${System.getProperty('java.vm.version')} (${System.getProperty('java.vm.vendor')})",
-                    'Built-On-Minecraft'      : minecraft_version
-            ])
+
+        jar {
+            from project(":standard").sourceSets.main.output
+            from project(":common").sourceSets.main.output
         }
     }
+
+    java.withSourcesJar()
+
+//    jar {
+//        from(rootProject.file("LICENSE")) {
+//            rename { "${it}_${mod_name}" }
+//        }
+//        manifest {
+//            attributes([
+//                    'Specification-Title'     : mod_name,
+//                    'Specification-Vendor'    : mod_author,
+//                    'Specification-Version'   : project.jar.archiveVersion,
+//                    'Implementation-Title'    : project.name,
+//                    'Implementation-Version'  : project.jar.archiveVersion,
+//                    'Implementation-Vendor'   : mod_author,
+//                    'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+//                    'Timestamp'               : System.currentTimeMillis(),
+//                    'Built-On-Java'           : "${System.getProperty('java.vm.version')} (${System.getProperty('java.vm.vendor')})",
+//                    'Built-On-Minecraft'      : minecraft_version
+//            ])
+//        }
+//    }
 
     sourcesJar {
         from(rootProject.file("LICENSE")) {
@@ -60,24 +86,10 @@ subprojects {
         }
     }
 
-    tasks.withType(JavaCompile).configureEach {
-
-        it.options.encoding = 'UTF-8'
-        it.options.getRelease().set(17)
-    }
-
     processResources {
-        filesMatching(['pack.mcmeta', 'fabric.mod.json', 'META-INF/mods.toml', 'mods.toml', '*.mixins.json']) {
+        filesMatching(['pack.mcmeta', 'fabric.mod.json', 'META-INF/neoforge.mods.toml', 'neoforge.mods.toml', '*.mixins.json']) {
             expand project.properties
         }
-    }
-
-    // Disables Gradle's custom module metadata from being published to maven. The
-    // metadata includes mapped dependencies which are not reasonably consumable by
-    // other mod developers.
-    tasks.withType(GenerateModuleMetadata).configureEach {
-
-        enabled = false
     }
 
     publishing {
@@ -95,64 +107,64 @@ subprojects {
     }
 }
 
-publishMods {
-    dryRun = providers.environmentVariable("CURSE_TOKEN").getOrNull() == null
-    changelog = file("./CHANGELOG.md").text
-    version = "${mod_version}"
-    type = STABLE
-
-    def fabricOptions = publishOptions {
-        file = project.provider { project(":fabric").tasks.remapJar }.flatMap { it.archiveFile }
-        displayName = "${project.name} Fabric ${mod_version}+mc${minecraft_version}"
-        modLoaders.add("fabric")
-    }
-
-    def forgeOptions = publishOptions {
-        file = project.provider { project(":forge").tasks.jar }.flatMap { it.archiveFile }
-        displayName = "${project.name} Forge ${mod_version}+mc${minecraft_version}"
-        modLoaders.add("forge")
-    }
-
-    def curseForgeOptions = curseforgeOptions {
-        accessToken = providers.environmentVariable("CURSE_TOKEN")
-        projectId = "${curseforge_id}"
-        minecraftVersions.add("${minecraft_version}")
-    }
-
-    def modrinthOptions = modrinthOptions {
-        accessToken = providers.environmentVariable("MODRINTH_TOKEN")
-        projectId = "${modrinth_id}"
-        minecraftVersions.add("${minecraft_version}")
-    }
-
-    curseforge("curseforgeFabric") {
-        from(curseForgeOptions, fabricOptions)
-        requires {
-            slug = "fabric-api"
-        }
-    }
-
-    curseforge("curseforgeForge") {
-        from(curseForgeOptions, forgeOptions)
-    }
-
-
-    modrinth("modrinthFabric") {
-        from(modrinthOptions, fabricOptions)
-        requires {
-            slug = "fabric-api"
-        }
-    }
-
-    modrinth("modrinthForge") {
-        from(modrinthOptions, forgeOptions)
-    }
-
-    github {
-        file = project.provider { project(":forge").tasks.jar }.flatMap { it.archiveFile }
-        additionalFiles.from project.provider { project(":fabric").tasks.remapJar }.flatMap { it.archiveFile }
-        repository = "${github_repo}"
-        accessToken = providers.environmentVariable("GITHUB_TOKEN")
-        commitish = providers.environmentVariable("GITHUB_SHA").orElse("dryRun")
-    }
-}
+//publishMods {
+//    dryRun = providers.environmentVariable("CURSE_TOKEN").getOrNull() == null
+//    changelog = file("./CHANGELOG.md").text
+//    version = "${mod_version}"
+//    type = STABLE
+//
+//    def fabricOptions = publishOptions {
+//        file = project.provider { project(":fabric").tasks.remapJar }.flatMap { it.archiveFile }
+//        displayName = "${project.name} Fabric ${mod_version}+mc${minecraft_version}"
+//        modLoaders.add("fabric")
+//    }
+//
+//    def forgeOptions = publishOptions {
+//        file = project.provider { project(":forge").tasks.jar }.flatMap { it.archiveFile }
+//        displayName = "${project.name} Forge ${mod_version}+mc${minecraft_version}"
+//        modLoaders.add("forge")
+//    }
+//
+//    def curseForgeOptions = curseforgeOptions {
+//        accessToken = providers.environmentVariable("CURSE_TOKEN")
+//        projectId = "${curseforge_id}"
+//        minecraftVersions.add("${minecraft_version}")
+//    }
+//
+//    def modrinthOptions = modrinthOptions {
+//        accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+//        projectId = "${modrinth_id}"
+//        minecraftVersions.add("${minecraft_version}")
+//    }
+//
+//    curseforge("curseforgeFabric") {
+//        from(curseForgeOptions, fabricOptions)
+//        requires {
+//            slug = "fabric-api"
+//        }
+//    }
+//
+//    curseforge("curseforgeForge") {
+//        from(curseForgeOptions, forgeOptions)
+//    }
+//
+//
+//    modrinth("modrinthFabric") {
+//        from(modrinthOptions, fabricOptions)
+//        requires {
+//            slug = "fabric-api"
+//        }
+//    }
+//
+//    modrinth("modrinthForge") {
+//        from(modrinthOptions, forgeOptions)
+//    }
+//
+//    github {
+//        file = project.provider { project(":forge").tasks.jar }.flatMap { it.archiveFile }
+//        additionalFiles.from project.provider { project(":fabric").tasks.remapJar }.flatMap { it.archiveFile }
+//        repository = "${github_repo}"
+//        accessToken = providers.environmentVariable("GITHUB_TOKEN")
+//        commitish = providers.environmentVariable("GITHUB_SHA").orElse("dryRun")
+//    }
+//}

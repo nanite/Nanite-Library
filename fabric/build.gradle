@@ -1,25 +1,30 @@
 plugins {
-    id 'java'
-    id 'idea'
     id 'fabric-loom'
 }
 
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
+
     mappings loom.officialMojangMappings()
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
-    implementation project(":common")
-    include(implementation('com.electronwill.night-config:core:3.6.0'))
-    include(implementation('com.electronwill.night-config:toml:3.6.0'))
+
+    include(implementation("de.marhali:json5-java:3.0.0"))
 }
 
 loom {
-    if (project(":common").file("src/main/resources/${mod_id}.accesswidener").exists()) {
-        accessWidenerPath.set(project(":common").file("src/main/resources/${mod_id}.accesswidener"))
-    }
+    accessWidenerPath = project(":common").file("src/main/resources/nanitelibrary.accesswidener")
+
     mixin {
-        defaultRefmapName.set("${mod_id}.refmap.json")
+        useLegacyMixinAp = false
+    }
+
+    mods {
+        "nanitelibrary" {
+            sourceSet sourceSets.main
+            sourceSet("main", project(":common"))
+            sourceSet("main", project(":standard"))
+        }
     }
 
     runs {
@@ -55,24 +60,4 @@ publishing {
             from components.java
         }
     }
-}
-
-tasks.withType(JavaCompile).configureEach {
-    source(project(":common").sourceSets.main.allSource)
-//    source(project(":standard").sourceSets.main.allSource)
-}
-
-tasks.withType(Javadoc).configureEach {
-    source(project(":common").sourceSets.main.allJava)
-//    source(project(":standard").sourceSets.main.allJava)
-}
-
-tasks.named("sourcesJar", Jar) {
-    from(project(":common").sourceSets.main.allSource)
-//    from(project(":standard").sourceSets.main.allSource)
-}
-
-processResources {
-    from project(":common").sourceSets.main.resources
-//    from project(":standard").sourceSets.main.resources
 }
