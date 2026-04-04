@@ -16,10 +16,10 @@
     "environment": "*",
     "entrypoints": {
         "main": [
-            "dev.nanite.nanitelibrary.fabric.NaniteLibraryFabric"
+            "dev.nanite.library.fabric.NaniteLibraryFabric"
         ],
         "fabric-datagen": [
-            "dev.nanite.nanitelibrary.fabric.datagen.NaniteLibraryDataGen"
+            "dev.nanite.library.fabric.datagen.NaniteLibraryDataGen"
         ]
     },
     "mixins": [
