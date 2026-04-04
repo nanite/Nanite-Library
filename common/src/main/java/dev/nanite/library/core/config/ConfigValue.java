@@ -1,6 +1,7 @@
 package dev.nanite.library.core.config;
 
 import de.marhali.json5.Json5Element;
+import org.jspecify.annotations.Nullable;
 
 import java.util.function.Supplier;
 
@@ -11,6 +12,9 @@ public abstract class ConfigValue<T> implements Supplier<T> {
 
     private boolean loaded = false;
     private T value;
+
+    @Nullable
+    private String[] comments;
 
     public ConfigValue(IConfigParent parent, String key, T defaultValue) {
         this.parent = parent;
@@ -23,6 +27,23 @@ public abstract class ConfigValue<T> implements Supplier<T> {
 
     public abstract Json5Element serialize();
 
+    public boolean isValid(T element) {
+        return true;
+    }
+
+    public ConfigValue<T> comments(String... comments) {
+        this.comments = comments;
+        return this;
+    }
+
+    public Json5Element serializeWithComments() {
+        Json5Element element = serialize();
+        if (comments != null) {
+            element.setComment(String.join("\n", comments));
+        }
+        return element;
+    }
+
     public void load() {
         if (loaded) {
             return;
@@ -32,6 +53,10 @@ public abstract class ConfigValue<T> implements Supplier<T> {
         if (value != null) {
             try {
                 this.value = deserialize(value);
+                if (!isValid(this.value)) {
+                    Config.LOGGER.warn("Loaded config value for key {} is invalid, using default value.", key);
+                    this.value = defaultValue;
+                }
             } catch (Exception e) {
                 Config.LOGGER.warn("Failed to load config value for key {}, using default value. Error: {}", key, e.getMessage());
                 this.value = defaultValue;
@@ -44,8 +69,7 @@ public abstract class ConfigValue<T> implements Supplier<T> {
     }
 
     public void save() {
-        Json5Element element = serialize();
-        this.parent.saveValue(key, element);
+        this.parent.saveValue(key, serializeWithComments());
     }
 
     public void set(T value) {
@@ -64,5 +88,9 @@ public abstract class ConfigValue<T> implements Supplier<T> {
         }
 
         return value;
+    }
+
+    public @Nullable String[] comments() {
+        return comments;
     }
 }

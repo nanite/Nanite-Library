@@ -12,6 +12,11 @@ public class ConfigValueGroup extends ConfigValue<ConfigValueGroup> implements I
     }
 
     @Override
+    public ConfigValueGroup comments(String... comments) {
+        return (ConfigValueGroup) super.comments(comments);
+    }
+
+    @Override
     public ConfigContainer getContainer() {
         return container;
     }
@@ -36,7 +41,11 @@ public class ConfigValueGroup extends ConfigValue<ConfigValueGroup> implements I
 
     @Override
     public Json5Element serialize() {
-        return container.getData();
+        Json5Object data = container.getData();
+        if (this.comments() != null) {
+            data.setComment(String.join("\n", this.comments()));
+        }
+        return data;
     }
 
     @Override

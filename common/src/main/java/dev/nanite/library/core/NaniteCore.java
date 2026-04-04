@@ -2,7 +2,6 @@ package dev.nanite.library.core;
 
 import dev.nanite.library.core.registry.NaniteRegistry;
 import dev.nanite.library.platform.Platform;
-import dev.nanite.library.platform.Services;
 import net.minecraft.core.Registry;
 
 public class NaniteCore {
