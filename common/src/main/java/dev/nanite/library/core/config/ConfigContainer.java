@@ -36,37 +36,37 @@ public class ConfigContainer {
         data.add(key, element);
     }
 
-    public ConfigValue<Integer> intValue(String key, int defaultValue) {
+    public IntConfigValue intValue(String key, int defaultValue) {
         IntConfigValue value = new IntConfigValue(owner, key, defaultValue);
         values.put(key, value);
         return value;
     }
 
-    public ConfigValue<String> stringValue(String key, String defaultValue) {
+    public StringConfigValue stringValue(String key, String defaultValue) {
         StringConfigValue value = new StringConfigValue(owner, key, defaultValue);
         values.put(key, value);
         return value;
     }
 
-    public ConfigValue<Boolean> booleanValue(String key, boolean defaultValue) {
+    public BooleanConfigValue booleanValue(String key, boolean defaultValue) {
         BooleanConfigValue value = new BooleanConfigValue(owner, key, defaultValue);
         values.put(key, value);
         return value;
     }
 
-    public ConfigValue<Float> floatValue(String key, float defaultValue) {
+    public FloatConfigValue floatValue(String key, float defaultValue) {
         FloatConfigValue value = new FloatConfigValue(owner, key, defaultValue);
         values.put(key, value);
         return value;
     }
 
-    public ConfigValue<Double> doubleValue(String key, double defaultValue) {
+    public DoubleConfigValue doubleValue(String key, double defaultValue) {
         DoubleConfigValue value = new DoubleConfigValue(owner, key, defaultValue);
         values.put(key, value);
         return value;
     }
 
-    public ConfigValue<Long> longValue(String key, long defaultValue) {
+    public LongConfigValue longValue(String key, long defaultValue) {
         LongConfigValue value = new LongConfigValue(owner, key, defaultValue);
         values.put(key, value);
         return value;

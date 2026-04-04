@@ -118,7 +118,6 @@ public class Config implements IConfigParent {
                 Files.createDirectories(configDir);
             }
 
-            // TODO: Something is wrong here.
             // Serialize all values into container data
             for (Map.Entry<String, ConfigValue<?>> entry : container.getValues().entrySet()) {
                 String key = entry.getKey();

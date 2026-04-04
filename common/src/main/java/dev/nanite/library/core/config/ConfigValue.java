@@ -3,6 +3,9 @@ package dev.nanite.library.core.config;
 import de.marhali.json5.Json5Element;
 import org.jspecify.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public abstract class ConfigValue<T> implements Supplier<T> {
@@ -27,7 +30,7 @@ public abstract class ConfigValue<T> implements Supplier<T> {
 
     public abstract Json5Element serialize();
 
-    public boolean isValid(T element) {
+    public boolean isValid(T element, Consumer<String> errorCollector) {
         return true;
     }
 
@@ -53,8 +56,15 @@ public abstract class ConfigValue<T> implements Supplier<T> {
         if (value != null) {
             try {
                 this.value = deserialize(value);
-                if (!isValid(this.value)) {
-                    Config.LOGGER.warn("Loaded config value for key {} is invalid, using default value.", key);
+                List<String> validationErrors = new ArrayList<>();
+                if (!isValid(this.value, validationErrors::add)) {
+                    String errorMsg = validationErrors.isEmpty() 
+                        ? "Loaded config value for key " + key + " is invalid"
+                        : String.join(", ", validationErrors);
+
+                    Config.LOGGER.warn("Loaded config value for key {} is invalid, using default value. Errors: {}", 
+                        key, errorMsg);
+
                     this.value = defaultValue;
                 }
             } catch (Exception e) {
@@ -73,6 +83,15 @@ public abstract class ConfigValue<T> implements Supplier<T> {
     }
 
     public void set(T value) {
+        List<String> validationErrors = new ArrayList<>();
+        if (!isValid(value, validationErrors::add)) {
+            String errorMsg = validationErrors.isEmpty()
+                ? "Value " + value + " is not valid for config key '" + key + "'"
+                : String.join(", ", validationErrors);
+            throw new IllegalArgumentException(errorMsg);
+        }
+        
+        T oldValue = this.value;
         this.value = value;
         save();
     }
@@ -88,9 +107,5 @@ public abstract class ConfigValue<T> implements Supplier<T> {
         }
 
         return value;
-    }
-
-    public @Nullable String[] comments() {
-        return comments;
     }
 }

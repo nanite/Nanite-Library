@@ -1,6 +1,7 @@
 package dev.nanite.library.core.config;
 
 import de.marhali.json5.Json5Element;
+import dev.nanite.library.core.config.values.*;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
@@ -9,7 +10,6 @@ import java.util.function.Function;
 public interface IConfigParent {
     ConfigContainer getContainer();
 
-    // Data access methods
     default @Nullable Json5Element getValue(String key) {
         return getContainer().getValue(key);
     }
@@ -18,28 +18,27 @@ public interface IConfigParent {
         getContainer().saveValue(key, element);
     }
 
-    // Primitive type factory methods
-    default ConfigValue<Integer> intValue(String key, int defaultValue) {
+    default IntConfigValue intValue(String key, int defaultValue) {
         return getContainer().intValue(key, defaultValue);
     }
 
-    default ConfigValue<String> stringValue(String key, String defaultValue) {
+    default StringConfigValue stringValue(String key, String defaultValue) {
         return getContainer().stringValue(key, defaultValue);
     }
 
-    default ConfigValue<Boolean> booleanValue(String key, boolean defaultValue) {
+    default BooleanConfigValue booleanValue(String key, boolean defaultValue) {
         return getContainer().booleanValue(key, defaultValue);
     }
 
-    default ConfigValue<Float> floatValue(String key, float defaultValue) {
+    default FloatConfigValue floatValue(String key, float defaultValue) {
         return getContainer().floatValue(key, defaultValue);
     }
 
-    default ConfigValue<Double> doubleValue(String key, double defaultValue) {
+    default DoubleConfigValue doubleValue(String key, double defaultValue) {
         return getContainer().doubleValue(key, defaultValue);
     }
 
-    default ConfigValue<Long> longValue(String key, long defaultValue) {
+    default LongConfigValue longValue(String key, long defaultValue) {
         return getContainer().longValue(key, defaultValue);
     }
 

@@ -5,9 +5,25 @@ import de.marhali.json5.Json5Primitive;
 import dev.nanite.library.core.config.ConfigValue;
 import dev.nanite.library.core.config.IConfigParent;
 
+import java.util.function.Consumer;
+
 public class BooleanConfigValue extends ConfigValue<Boolean> {
     public BooleanConfigValue(IConfigParent parent, String key, boolean defaultValue) {
         super(parent, key, defaultValue);
+    }
+
+    @Override
+    public BooleanConfigValue comments(String... comments) {
+        return (BooleanConfigValue) super.comments(comments);
+    }
+
+    @Override
+    public boolean isValid(Boolean value, Consumer<String> errorCollector) {
+        if (value == null) {
+            errorCollector.accept("Value cannot be null");
+            return false;
+        }
+        return true;
     }
 
     @Override
