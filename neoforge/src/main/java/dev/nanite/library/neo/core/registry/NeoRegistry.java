@@ -7,6 +7,8 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.LinkedList;
@@ -15,7 +17,7 @@ import java.util.function.Supplier;
 
 public class NeoRegistry<T> implements NaniteRegistry<T> {
     private final String modId;
-    private final List<RegistryHolder<T>> entries = new LinkedList<>();
+    private final List<RegistryHolder<T, ? extends T>> entries = new LinkedList<>();
     private final DeferredRegister<T> registry;
 
     public NeoRegistry(String modId, ResourceKey<? extends Registry<T>> backingRegistry) {
@@ -28,18 +30,19 @@ public class NeoRegistry<T> implements NaniteRegistry<T> {
      */
     @Override
     public void initialize() {
-//        registry.register(FMLJavaModLoadingContext.get().getModEventBus());
+        registry.register(ModList.get().getModContainerById(this.modId)
+                .map(ModContainer::getEventBus).orElseThrow());
     }
 
     @Override
-    public RegistryHolder<T> register(String id, Supplier<T> value) {
-        NeoRegistryHolder<T> holder = new NeoRegistryHolder<>(Identifier.fromNamespaceAndPath(this.modId, id), registry.register(id, value));
+    public <I extends T> RegistryHolder<T, I> register(String id, Supplier<I> value) {
+        NeoRegistryHolder<T, I> holder = new NeoRegistryHolder<>(Identifier.fromNamespaceAndPath(this.modId, id), registry.register(id, value));
         entries.add(holder);
         return holder;
     }
 
     @Override
-    public ImmutableList<RegistryHolder<T>> entries() {
+    public ImmutableList<RegistryHolder<T, ? extends T>> entries() {
         return ImmutableList.copyOf(entries);
     }
 

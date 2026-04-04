@@ -1,8 +1,6 @@
 package dev.nanite.library.neo;
 
 import dev.nanite.library.NaniteLibrary;
-import dev.nanite.library.core.registry.reload.NaniteReloadListenerManager;
-import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
@@ -13,7 +11,7 @@ import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static dev.nanite.library.Constants.MOD_ID;
+import static dev.nanite.library.NaniteLibrary.MOD_ID;
 
 @Mod(MOD_ID)
 public class NaniteLibraryNeo {

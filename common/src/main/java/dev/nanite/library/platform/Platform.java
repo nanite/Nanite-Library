@@ -1,12 +1,16 @@
-package dev.nanite.library.platform.services;
+package dev.nanite.library.platform;
 
 import dev.nanite.library.core.registry.NaniteRegistry;
-import dev.nanite.library.platform.Weirdness;
 import net.minecraft.core.Registry;
 
 import java.nio.file.Path;
+import java.util.ServiceLoader;
 
-public interface IPlatformHelper {
+public interface Platform {
+    Platform INSTANCE = ServiceLoader.load(Platform.class)
+            .findFirst()
+            .orElseThrow(() -> new NullPointerException("Failed to load Platform service"));
+
     <T> NaniteRegistry<T> createRegistry(String modId, Registry<T> backingRegistry);
 
     Weirdness weirdness();
@@ -27,6 +31,8 @@ public interface IPlatformHelper {
     boolean isModLoaded(String modId);
 
     Path gamePath();
+
+    Path configPath();
 
     /**
      * Check if the game is currently in a development environment.

@@ -9,11 +9,11 @@ import java.util.stream.Stream;
 public interface NaniteRegistry<T> {
     void initialize();
 
-    RegistryHolder<T> register(String id, Supplier<T> value);
+    <I extends T> RegistryHolder<T, I> register(String id, Supplier<I> value);
 
-    ImmutableList<RegistryHolder<T>> entries();
+    ImmutableList<RegistryHolder<T, ? extends T>> entries();
 
-    default Stream<RegistryHolder<T>> stream() {
+    default Stream<RegistryHolder<T, ? extends T>> stream() {
         return entries().stream();
     }
 

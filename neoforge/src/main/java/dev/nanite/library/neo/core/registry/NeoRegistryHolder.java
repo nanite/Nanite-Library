@@ -5,7 +5,7 @@ import net.minecraft.resources.Identifier;
 
 import java.util.function.Supplier;
 
-public class NeoRegistryHolder<T> implements RegistryHolder<T> {
+public class NeoRegistryHolder<R, T extends R> implements RegistryHolder<R, T> {
     private final Identifier id;
     private final Supplier<T> value;
 

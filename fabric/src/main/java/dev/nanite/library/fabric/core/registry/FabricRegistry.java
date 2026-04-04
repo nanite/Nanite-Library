@@ -14,7 +14,7 @@ import java.util.function.Supplier;
 public class FabricRegistry<T> implements NaniteRegistry<T> {
     private final String modId;
     private final Registry<T> backingRegistry;
-    private final List<RegistryHolder<T>> entries = new ArrayList<>();
+    private final List<RegistryHolder<T, ? extends T>> entries = new ArrayList<>();
 
     public FabricRegistry(String modId, Registry<T> backingRegistry) {
         this.modId = modId;
@@ -30,18 +30,15 @@ public class FabricRegistry<T> implements NaniteRegistry<T> {
     }
 
     @Override
-    public RegistryHolder<T> register(String id, Supplier<T> value) {
-        FabricRegistryHolder<T> holder = new FabricRegistryHolder<>(Identifier.fromNamespaceAndPath(modId, id), value.get());
+    public <I extends T> RegistryHolder<T, I> register(String id, Supplier<I> value) {
+        FabricRegistryHolder<T, I> holder = new FabricRegistryHolder<>(Identifier.fromNamespaceAndPath(modId, id), value.get());
         Registry.register(backingRegistry, holder.identifier(), holder.get());
         entries.add(holder);
         return holder;
     }
 
-    /**
-     * Returns an immutable copy of the entries list.
-     */
     @Override
-    public ImmutableList<RegistryHolder<T>> entries() {
+    public ImmutableList<RegistryHolder<T, ? extends T>> entries() {
         return ImmutableList.copyOf(entries);
     }
 

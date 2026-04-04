@@ -3,17 +3,16 @@ package dev.nanite.library.neo.platform;
 import dev.nanite.library.core.registry.NaniteRegistry;
 import dev.nanite.library.neo.core.registry.NeoRegistry;
 import dev.nanite.library.platform.Weirdness;
-import dev.nanite.library.platform.services.IPlatformHelper;
+import dev.nanite.library.platform.Platform;
 import net.minecraft.core.Registry;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLEnvironment;
-import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.fml.loading.FMLPaths;
 
 import java.nio.file.Path;
 
-public class NeoPlatformHelper implements IPlatformHelper {
-    private static final NeoWeirdness WEIRDNESS = new NeoWeirdness();
+public class NeoPlatformHelper implements Platform {
+    private final NeoWeirdness weirdness = new NeoWeirdness();
 
     @Override
     public <T> NaniteRegistry<T> createRegistry(String modId, Registry<T> backingRegistry) {
@@ -22,7 +21,7 @@ public class NeoPlatformHelper implements IPlatformHelper {
 
     @Override
     public Weirdness weirdness() {
-        return WEIRDNESS;
+        return weirdness;
     }
 
     @Override
@@ -41,8 +40,12 @@ public class NeoPlatformHelper implements IPlatformHelper {
     }
 
     @Override
-    public boolean isDevelopmentEnvironment() {
+    public Path configPath() {
+        return FMLPaths.CONFIGDIR.get();
+    }
 
+    @Override
+    public boolean isDevelopmentEnvironment() {
         return !FMLEnvironment.isProduction();
     }
 }

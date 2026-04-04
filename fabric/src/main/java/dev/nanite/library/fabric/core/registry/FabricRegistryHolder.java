@@ -3,7 +3,7 @@ package dev.nanite.library.fabric.core.registry;
 import dev.nanite.library.core.registry.RegistryHolder;
 import net.minecraft.resources.Identifier;
 
-public class FabricRegistryHolder<T> implements RegistryHolder<T> {
+public class FabricRegistryHolder<R, T extends R> implements RegistryHolder<R, T> {
     private final Identifier identifier;
     private final T value;
 

@@ -4,7 +4,7 @@ import net.minecraft.resources.Identifier;
 
 import java.util.function.Supplier;
 
-public interface RegistryHolder<T> extends Supplier<T> {
+public interface RegistryHolder<R, T extends R> extends Supplier<T> {
     @Override
     T get();
 

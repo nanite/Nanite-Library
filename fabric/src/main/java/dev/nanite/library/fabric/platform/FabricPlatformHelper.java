@@ -3,14 +3,14 @@ package dev.nanite.library.fabric.platform;
 import dev.nanite.library.core.registry.NaniteRegistry;
 import dev.nanite.library.fabric.core.registry.FabricRegistry;
 import dev.nanite.library.platform.Weirdness;
-import dev.nanite.library.platform.services.IPlatformHelper;
+import dev.nanite.library.platform.Platform;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.Registry;
 
 import java.nio.file.Path;
 
-public class FabricPlatformHelper implements IPlatformHelper {
-    private static final FabricWeirdness WEIRDNESS = new FabricWeirdness();
+public class FabricPlatformHelper implements Platform {
+    private final FabricWeirdness weirdness = new FabricWeirdness();
 
     @Override
     public <T> NaniteRegistry<T> createRegistry(String modId, Registry<T> backingRegistry) {
@@ -19,7 +19,7 @@ public class FabricPlatformHelper implements IPlatformHelper {
 
     @Override
     public Weirdness weirdness() {
-        return WEIRDNESS;
+        return weirdness;
     }
 
     @Override
@@ -36,6 +36,11 @@ public class FabricPlatformHelper implements IPlatformHelper {
     @Override
     public Path gamePath() {
         return FabricLoader.getInstance().getGameDir();
+    }
+
+    @Override
+    public Path configPath() {
+        return FabricLoader.getInstance().getConfigDir();
     }
 
     @Override
