@@ -32,7 +32,6 @@ loom {
         "${mod_id}" {
             sourceSet sourceSets.main
             sourceSet("main", ":common")
-            sourceSet("main", project(":standard"))
         }
     }
 }

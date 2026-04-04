@@ -1,6 +1,7 @@
 package dev.nanite.library.fabric;
 
 import dev.nanite.library.core.registry.reload.NaniteReloadListenerManager;
+import dev.nanite.standard.utils.Lazy;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
@@ -24,6 +25,9 @@ public class NaniteLibraryFabric implements ModInitializer {
     public void onInitialize() {
         NaniteLibrary.init();
         LOGGER.debug("Registering reload listeners");
+
+        System.out.println(Lazy.of(() -> "hello").get());
+
         // TODO: Fix me
 //        for (Map.Entry<ResourceLocation, PreparableReloadListener> entry : NaniteReloadListenerManager.INSTANCE.getListeners(NaniteReloadListenerManager.ReloadType.SERVER).entrySet()) {
 //            ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(new IdentifiableResourceReloadListener() {

@@ -49,7 +49,7 @@ subprojects {
     if (project.name != "common") {
         dependencies {
             api project(":common")
-            api project(path: ":standard", configuration: "loomExportedClasspath")
+            api project(":standard")
         }
 
         jar {
