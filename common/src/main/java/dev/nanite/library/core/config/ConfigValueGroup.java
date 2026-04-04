@@ -3,6 +3,8 @@ package dev.nanite.library.core.config;
 import de.marhali.json5.Json5Element;
 import de.marhali.json5.Json5Object;
 
+import java.util.Map;
+
 public class ConfigValueGroup extends ConfigValue<ConfigValueGroup> implements IConfigParent {
     private final ConfigContainer container;
 
@@ -42,7 +44,7 @@ public class ConfigValueGroup extends ConfigValue<ConfigValueGroup> implements I
     @Override
     public Json5Element serialize() {
         // First, serialize all child values into the container's data
-        for (java.util.Map.Entry<String, ConfigValue<?>> entry : container.getValues().entrySet()) {
+        for (Map.Entry<String, ConfigValue<?>> entry : container.getValues().entrySet()) {
             container.saveValue(entry.getKey(), entry.getValue().serialize());
         }
         
