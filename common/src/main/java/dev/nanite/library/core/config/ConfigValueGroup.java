@@ -3,15 +3,17 @@ package dev.nanite.library.core.config;
 import de.marhali.json5.Json5Element;
 import de.marhali.json5.Json5Object;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Supplier;
+public class ConfigValueGroup extends ConfigValue<ConfigValueGroup> implements IConfigParent {
+    private final ConfigContainer container;
 
-public class ConfigValueGroup extends ConfigValue<ConfigValueGroup> {
-    private final Map<String, ConfigValue<?>> values = new HashMap<>();
-
-    public ConfigValueGroup(Config parent, String key) {
+    public ConfigValueGroup(IConfigParent parent, String key) {
         super(parent, key, null);
+        this.container = new ConfigContainer(this);
+    }
+
+    @Override
+    public ConfigContainer getContainer() {
+        return container;
     }
 
     @Override
@@ -20,16 +22,25 @@ public class ConfigValueGroup extends ConfigValue<ConfigValueGroup> {
             throw new IllegalArgumentException("Expected a JSON object for ConfigValueGroup");
         }
 
+        // Copy data from deserialized object into our container's data
+        Json5Object data = container.getData();
+        for (String key : obj.keySet()) {
+            data.add(key, obj.get(key));
+        }
 
+        // Load all child values
+        container.loadValues();
+
+        return this;
     }
 
     @Override
     public Json5Element serialize() {
-        var obj = new Json5Object();
-        for (var entry : values.entrySet()) {
-            obj.add(entry.getKey(), entry.getValue().serialize());
-        }
+        return container.getData();
+    }
 
-        return obj;
+    @Override
+    public ConfigValueGroup get() {
+        return this;
     }
 }

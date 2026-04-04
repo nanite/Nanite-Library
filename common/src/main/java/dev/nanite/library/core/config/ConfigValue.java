@@ -5,14 +5,14 @@ import de.marhali.json5.Json5Element;
 import java.util.function.Supplier;
 
 public abstract class ConfigValue<T> implements Supplier<T> {
-    private final Config parent;
+    private final IConfigParent parent;
     private final String key;
     private final T defaultValue;
 
     private boolean loaded = false;
     private T value;
 
-    public ConfigValue(Config parent, String key, T defaultValue) {
+    public ConfigValue(IConfigParent parent, String key, T defaultValue) {
         this.parent = parent;
         this.key = key;
         this.defaultValue = defaultValue;

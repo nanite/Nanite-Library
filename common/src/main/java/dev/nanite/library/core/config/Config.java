@@ -9,45 +9,54 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Config {
+/// Expected use case.
+/// ```java
+/// public static final Config config = new Config("mymod");
+/// public static final ConfigValue<Integer> someValue = config.intValue("someValue", 42);
+///
+/// public static final ConfigValueGroup someGroup = config.group("someGroup");
+/// public static final ConfigValue<String> someGroupValue = someGroup.stringValue("someGroupValue", "Hello, world!");
+///
+/// public static void init() {
+///     ConfigManager.registerClientConfig(config);
+/// }
+/// ```
+public class Config implements IConfigParent {
     static Logger LOGGER = LoggerFactory.getLogger(Config.class);
 
     private final String modId;
 
     @Nullable
     private final String type;
-    private final Map<String, ConfigValue<?>> values;
+    private final ConfigContainer container;
 
     public Config(String modId, @Nullable String type) {
         this.modId = modId;
         this.type = type;
-        this.values = new HashMap<>();
+        this.container = new ConfigContainer(this);
     }
 
     public Config(String modId) {
         this(modId, null);
     }
 
+    @Override
+    public ConfigContainer getContainer() {
+        return container;
+    }
+
+    // All IConfigParent methods (getValue, saveValue, intValue, stringValue, group)
+    // are inherited as default methods from the interface
+
     public void load() {
         // TODO: Load from disk.
         // Load in a json5Object.
         var configData = new Json5Object();
 
-        for (var entry : values.entrySet()) {
-            entry.getValue().load();
-        }
+        container.loadValues();
     }
 
     public void save() {
         // TODO: Write to disk.
-    }
-
-    @Nullable
-    public Json5Element getValue(String key) {
-        throw new UnsupportedOperationException("Config does not support getting values by key");
-    }
-
-    public void saveValue(String key, Json5Element element) {
-        throw new UnsupportedOperationException("Config does not support saving values by key");
     }
 }
