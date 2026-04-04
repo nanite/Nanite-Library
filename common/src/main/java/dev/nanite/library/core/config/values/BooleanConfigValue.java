@@ -18,12 +18,12 @@ public class BooleanConfigValue extends ConfigValue<Boolean> {
     }
 
     @Override
-    public boolean isValid(Boolean value, Consumer<String> errorCollector) {
+    public boolean isInvalid(Boolean value, Consumer<String> errorCollector) {
         if (value == null) {
             errorCollector.accept("Value cannot be null");
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     @Override

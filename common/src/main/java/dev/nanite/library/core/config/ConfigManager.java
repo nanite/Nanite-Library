@@ -14,36 +14,24 @@ public class ConfigManager {
     private final Set<ConfigType> loadedConfigTypes = ConcurrentHashMap.newKeySet();
 
     public static void registerClientConfig(Config config) {
-        ConfigManager instance = get();
-        synchronized (instance.configs) {
-            if (instance.loadedConfigTypes.contains(ConfigType.CLIENT)) {
-                throw new IllegalStateException("Cannot register client config after client configs have been loaded.");
-            }
-            instance.configs.computeIfAbsent(ConfigType.CLIENT, k -> 
-                Collections.synchronizedList(new ArrayList<>())
-            ).add(config);
-        }
+            registerConfig(ConfigType.CLIENT, config);
     }
 
     public static void registerServerConfig(Config config) {
-        ConfigManager instance = get();
-        synchronized (instance.configs) {
-            if (instance.loadedConfigTypes.contains(ConfigType.SERVER)) {
-                throw new IllegalStateException("Cannot register server config after server configs have been loaded.");
-            }
-            instance.configs.computeIfAbsent(ConfigType.SERVER, k -> 
-                Collections.synchronizedList(new ArrayList<>())
-            ).add(config);
-        }
+        registerConfig(ConfigType.SERVER, config);
     }
 
     public static void registerCommonConfig(Config config) {
+        registerConfig(ConfigType.COMMON, config);
+    }
+
+    private static void registerConfig(ConfigType type, Config config) {
         ConfigManager instance = get();
         synchronized (instance.configs) {
-            if (instance.loadedConfigTypes.contains(ConfigType.COMMON)) {
-                throw new IllegalStateException("Cannot register common config after common configs have been loaded.");
+            if (instance.loadedConfigTypes.contains(type)) {
+                throw new IllegalStateException("Cannot register " + type + " config after configs of that type have been loaded.");
             }
-            instance.configs.computeIfAbsent(ConfigType.COMMON, k -> 
+            instance.configs.computeIfAbsent(type, k ->
                 Collections.synchronizedList(new ArrayList<>())
             ).add(config);
         }

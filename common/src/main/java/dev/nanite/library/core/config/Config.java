@@ -4,6 +4,7 @@ import de.marhali.json5.Json5;
 import de.marhali.json5.Json5Element;
 import de.marhali.json5.Json5Object;
 import de.marhali.json5.exception.Json5Exception;
+import dev.nanite.standard.utils.Lazy;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,21 +20,36 @@ public class Config implements IConfigParent {
 
     private final String modId;
 
+    private final ConfigType configType;
+
+    /// Meta name is used to allow for multiple modid configs such as 'machines', 'world', etc.
     @Nullable
-    private final String type;
+    private final String metaName;
     private final ConfigContainer container;
 
-    @Nullable
-    private Path configPath;
+    private final Lazy<Path> configPath = Lazy.of(this::computeConfigPath);
 
-    public Config(String modId, @Nullable String type) {
+    private Config(String modId, @Nullable String metaName, ConfigType configType) {
         this.modId = modId;
-        this.type = type;
+        this.metaName = metaName;
         this.container = new ConfigContainer(this);
+        this.configType = configType;
     }
 
-    public Config(String modId) {
-        this(modId, null);
+    private Config(String modId, ConfigType configType) {
+        this(modId, null, configType);
+    }
+
+    public static Config clientConfig(String modId) {
+        return new Config(modId, ConfigType.CLIENT);
+    }
+
+    public static Config serverConfig(String modId) {
+        return new Config(modId, ConfigType.SERVER);
+    }
+
+    public static Config commonConfig(String modId) {
+        return new Config(modId, ConfigType.COMMON);
     }
 
     @Override
@@ -46,25 +62,30 @@ public class Config implements IConfigParent {
     }
 
     @Nullable
-    public String getType() {
-        return type;
+    public String getMetaName() {
+        return metaName;
     }
 
-    public void setConfigPath(Path configPath) {
-        this.configPath = configPath;
+    public ConfigType getConfigType() {
+        return configType;
     }
 
-    public Path getConfigPath() {
-        if (configPath == null) {
-            // Default to config/<modId>.json5 or config/<modId>-<type>.json5
-            String filename = type != null ? modId + "-" + type + ".json5" : modId + ".json5";
-            configPath = Path.of("config", filename);
+    private Path computeConfigPath() {
+        StringBuilder fileNameBuilder = new StringBuilder(modId);
+
+        if (metaName != null && !metaName.isEmpty()) {
+            fileNameBuilder.append("_").append(metaName);
         }
-        return configPath;
+
+        fileNameBuilder
+                .append(this.configType.toString().toLowerCase())
+                .append(".json5");
+
+        return Path.of("config", fileNameBuilder.toString());
     }
 
     public void load() {
-        Path path = getConfigPath();
+        Path path = configPath.get();
 
         // Create config directory if it doesn't exist
         try {
@@ -109,7 +130,7 @@ public class Config implements IConfigParent {
     }
 
     public void save() {
-        Path path = getConfigPath();
+        Path path = configPath.get();
 
         try {
             // Ensure parent directory exists

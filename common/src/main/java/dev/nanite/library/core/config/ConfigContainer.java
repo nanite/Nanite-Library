@@ -4,6 +4,14 @@ import de.marhali.json5.Json5Element;
 import de.marhali.json5.Json5Object;
 import de.marhali.json5.Json5Primitive;
 import dev.nanite.library.core.config.values.*;
+import dev.nanite.library.utils.RegistryReference;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.material.Fluid;
 import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
@@ -171,6 +179,74 @@ public class ConfigContainer {
         ConfigValueGroup group = new ConfigValueGroup(owner, key);
         values.put(key, group);
         return group;
+    }
+
+    public <E extends Enum<E>> EnumConfigValue<E> enumValue(String key, E defaultValue) {
+        EnumConfigValue<E> value = new EnumConfigValue<>(owner, key, defaultValue);
+        values.put(key, value);
+        return value;
+    }
+
+    // Registry reference factory methods
+    public <T> RegistryReferenceConfigValue<T> registryValue(
+            String key, 
+            RegistryReference<T> defaultValue,
+            ResourceKey<? extends Registry<T>> registryKey
+    ) {
+        RegistryReferenceConfigValue<T> value = new RegistryReferenceConfigValue<>(owner, key, defaultValue, registryKey);
+        values.put(key, value);
+        return value;
+    }
+
+    public <T> ConfigValue<List<RegistryReference<T>>> registryListValue(
+            String key, 
+            List<RegistryReference<T>> defaultValue,
+            ResourceKey<? extends Registry<T>> registryKey
+    ) {
+        return listValue(
+            key,
+            defaultValue,
+            element -> {
+                if (element instanceof Json5Primitive primitive) {
+                    return RegistryReference.parse(primitive.getAsString(), registryKey);
+                }
+                throw new IllegalArgumentException("Expected string for registry reference");
+            },
+            ref -> Json5Primitive.fromString(ref.toString())
+        );
+    }
+
+    /// Generic map factory - keys are always strings, custom value serialization
+    public <V> MapConfigValue<String, V> mapValue(
+            String key,
+            Map<String, V> defaultValue,
+            Function<Json5Element, V> valueDeserializer,
+            Function<V, Json5Element> valueSerializer
+    ) {
+        MapConfigValue<String, V> value = new MapConfigValue<>(
+            owner, key, defaultValue, 
+            s -> s,  // Key is already string
+            s -> s,  // Key serializes to itself
+            valueDeserializer, 
+            valueSerializer
+        );
+        values.put(key, value);
+        return value;
+    }
+
+    // Convenience methods for common map types
+    public MapConfigValue<String, String> stringMapValue(String key, Map<String, String> defaultValue) {
+        return mapValue(
+            key,
+            defaultValue,
+            element -> {
+                if (element instanceof Json5Primitive primitive) {
+                    return primitive.getAsString();
+                }
+                throw new IllegalArgumentException("Expected string value in map");
+            },
+            Json5Primitive::fromString
+        );
     }
 
     public void loadValues() {

@@ -28,16 +28,16 @@ public class StringConfigValue extends ConfigValue<String> {
     }
 
     @Override
-    public boolean isValid(String value, Consumer<String> errorCollector) {
+    public boolean isInvalid(String value, Consumer<String> errorCollector) {
         if (value == null) {
             errorCollector.accept("Value cannot be null");
-            return false;
+            return true;
         }
         if (validationPattern != null && !validationPattern.matcher(value).matches()) {
             errorCollector.accept("Value '" + value + "' does not match required pattern");
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     @Override

@@ -30,8 +30,8 @@ public abstract class ConfigValue<T> implements Supplier<T> {
 
     public abstract Json5Element serialize();
 
-    public boolean isValid(T element, Consumer<String> errorCollector) {
-        return true;
+    public boolean isInvalid(T element, Consumer<String> errorCollector) {
+        return false;
     }
 
     public ConfigValue<T> comments(String... comments) {
@@ -57,7 +57,7 @@ public abstract class ConfigValue<T> implements Supplier<T> {
             try {
                 this.value = deserialize(value);
                 List<String> validationErrors = new ArrayList<>();
-                if (!isValid(this.value, validationErrors::add)) {
+                if (isInvalid(this.value, validationErrors::add)) {
                     String errorMsg = validationErrors.isEmpty() 
                         ? "Loaded config value for key " + key + " is invalid"
                         : String.join(", ", validationErrors);
@@ -84,7 +84,7 @@ public abstract class ConfigValue<T> implements Supplier<T> {
 
     public void set(T value) {
         List<String> validationErrors = new ArrayList<>();
-        if (!isValid(value, validationErrors::add)) {
+        if (isInvalid(value, validationErrors::add)) {
             String errorMsg = validationErrors.isEmpty()
                 ? "Value " + value + " is not valid for config key '" + key + "'"
                 : String.join(", ", validationErrors);

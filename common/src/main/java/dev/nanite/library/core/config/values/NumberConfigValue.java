@@ -37,10 +37,10 @@ public abstract class NumberConfigValue<T extends Number & Comparable<T>> extend
     }
 
     @Override
-    public boolean isValid(T value, Consumer<String> errorCollector) {
+    public boolean isInvalid(T value, Consumer<String> errorCollector) {
         if (value == null) {
             errorCollector.accept("Value cannot be null");
-            return false;
+            return true;
         }
         
         boolean valid = true;
@@ -52,7 +52,7 @@ public abstract class NumberConfigValue<T extends Number & Comparable<T>> extend
             errorCollector.accept("Value " + value + " exceeds maximum " + maxValue);
             valid = false;
         }
-        return valid;
+        return !valid;
     }
 
     @Override
