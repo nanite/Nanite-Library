@@ -5,6 +5,7 @@ import dev.nanite.library.client.NaniteLibraryClient;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
 import net.neoforged.neoforge.common.NeoForge;
@@ -19,10 +20,10 @@ public class NaniteLibraryClientNeoForge {
 
     private final NaniteLibraryClient libraryClient;
 
-    public NaniteLibraryClientNeoForge() {
+    public NaniteLibraryClientNeoForge(IEventBus modEventBus) {
         libraryClient = new NaniteLibraryClient();
 
-        NeoForge.EVENT_BUS.addListener(this::addReloadListeners);
+        modEventBus.addListener(this::addReloadListeners);
     }
 
     private void addReloadListeners(AddClientReloadListenersEvent event) {
