@@ -13,26 +13,15 @@ public class ConfigManager {
     private final Map<ConfigType, List<Config>> configs = new ConcurrentHashMap<>();
     private final Set<ConfigType> loadedConfigTypes = ConcurrentHashMap.newKeySet();
 
-    public static void registerClientConfig(Config config) {
-            registerConfig(ConfigType.CLIENT, config);
-    }
-
-    public static void registerServerConfig(Config config) {
-        registerConfig(ConfigType.SERVER, config);
-    }
-
-    public static void registerCommonConfig(Config config) {
-        registerConfig(ConfigType.COMMON, config);
-    }
-
-    private static void registerConfig(ConfigType type, Config config) {
+    public static void register(Config config) {
+        var type = config.getConfigType();
         ConfigManager instance = get();
         synchronized (instance.configs) {
             if (instance.loadedConfigTypes.contains(type)) {
                 throw new IllegalStateException("Cannot register " + type + " config after configs of that type have been loaded.");
             }
             instance.configs.computeIfAbsent(type, k ->
-                Collections.synchronizedList(new ArrayList<>())
+                    Collections.synchronizedList(new ArrayList<>())
             ).add(config);
         }
     }

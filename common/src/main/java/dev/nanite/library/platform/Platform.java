@@ -2,8 +2,11 @@ package dev.nanite.library.platform;
 
 import dev.nanite.library.core.registry.NaniteRegistry;
 import net.minecraft.core.Registry;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.resources.PreparableReloadListener;
 
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.ServiceLoader;
 
 public interface Platform {
@@ -47,7 +50,8 @@ public interface Platform {
      * @return The name of the environment type.
      */
     default String getEnvironmentName() {
-
         return isDevelopmentEnvironment() ? "development" : "production";
     }
+
+    void registerDataPackReloadListener(Map<Identifier, PreparableReloadListener> listeners);
 }

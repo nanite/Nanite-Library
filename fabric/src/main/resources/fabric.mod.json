@@ -18,6 +18,9 @@
         "main": [
             "dev.nanite.library.fabric.NaniteLibraryFabric"
         ],
+        "client": [
+            "dev.nanite.library.fabric.client.NaniteLibraryClientFabric"
+        ],
         "fabric-datagen": [
             "dev.nanite.library.fabric.datagen.NaniteLibraryDataGen"
         ]

@@ -1,17 +1,21 @@
 package dev.nanite.library.neo.platform;
 
 import dev.nanite.library.core.registry.NaniteRegistry;
+import dev.nanite.library.neo.NaniteLibraryNeoForge;
 import dev.nanite.library.neo.core.registry.NeoRegistry;
 import dev.nanite.library.platform.Weirdness;
 import dev.nanite.library.platform.Platform;
 import net.minecraft.core.Registry;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.fml.loading.FMLPaths;
 
 import java.nio.file.Path;
+import java.util.Map;
 
-public class NeoPlatformHelper implements Platform {
+public class PlatformNeoForge implements Platform {
     private final NeoWeirdness weirdness = new NeoWeirdness();
 
     @Override
@@ -47,5 +51,10 @@ public class NeoPlatformHelper implements Platform {
     @Override
     public boolean isDevelopmentEnvironment() {
         return !FMLEnvironment.isProduction();
+    }
+
+    @Override
+    public void registerDataPackReloadListener(Map<Identifier, PreparableReloadListener> listeners) {
+        NaniteLibraryNeoForge.reloadListeners.putAll(listeners);
     }
 }

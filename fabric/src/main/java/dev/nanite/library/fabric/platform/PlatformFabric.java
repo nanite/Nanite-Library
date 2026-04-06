@@ -4,12 +4,17 @@ import dev.nanite.library.core.registry.NaniteRegistry;
 import dev.nanite.library.fabric.core.registry.FabricRegistry;
 import dev.nanite.library.platform.Weirdness;
 import dev.nanite.library.platform.Platform;
+import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.Registry;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.resources.PreparableReloadListener;
 
 import java.nio.file.Path;
+import java.util.Map;
 
-public class FabricPlatformHelper implements Platform {
+public class PlatformFabric implements Platform {
     private final FabricWeirdness weirdness = new FabricWeirdness();
 
     @Override
@@ -47,5 +52,10 @@ public class FabricPlatformHelper implements Platform {
     public boolean isDevelopmentEnvironment() {
 
         return FabricLoader.getInstance().isDevelopmentEnvironment();
+    }
+
+    @Override
+    public void registerDataPackReloadListener(Map<Identifier, PreparableReloadListener> listeners) {
+        listeners.forEach((id, listener) -> ResourceLoader.get(PackType.SERVER_DATA).registerReloadListener(id, listener));
     }
 }
