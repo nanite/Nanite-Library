@@ -16,6 +16,8 @@ public class NaniteLibrary {
     public NaniteLibrary() {
         // TODO: We might need to mixin to do this sooner!
         ConfigManager.get().loadConfigs(ConfigType.COMMON);
+
+        Platform.INSTANCE.network().play2Client(ConfigSyncPacket.TYPE, ConfigSyncPacket.STREAM_CODEC, ConfigSyncPacket::handle);
     }
 
     public void onServerStarting(MinecraftServer server) {
