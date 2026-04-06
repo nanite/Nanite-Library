@@ -1,5 +1,7 @@
 package dev.nanite.library.core.config;
 
+import com.google.common.collect.ImmutableList;
+
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -43,4 +45,12 @@ public class ConfigManager {
         loadedConfigTypes.add(type);
     }
 
+    public ImmutableList<Config> getConfigsByType(ConfigType type) {
+        var configsByType = configs.get(type);
+        if (configsByType == null) {
+            return ImmutableList.of();
+        }
+
+        return ImmutableList.copyOf(configsByType);
+    }
 }

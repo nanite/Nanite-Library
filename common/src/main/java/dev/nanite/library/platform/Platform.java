@@ -1,9 +1,14 @@
 package dev.nanite.library.platform;
 
+import dev.nanite.library.core.network.NetworkRegistry;
 import dev.nanite.library.core.registry.NaniteRegistry;
 import net.minecraft.core.Registry;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
+import net.minecraft.world.entity.player.Player;
 
 import java.nio.file.Path;
 import java.util.Map;
@@ -37,6 +42,8 @@ public interface Platform {
 
     Path configPath();
 
+    Path modsPath();
+
     /**
      * Check if the game is currently in a development environment.
      *
@@ -54,4 +61,11 @@ public interface Platform {
     }
 
     void registerDataPackReloadListener(Map<Identifier, PreparableReloadListener> listeners);
+
+    /// Provides access to the network registry which can be used to register packets
+    NetworkRegistry network();
+
+    void sendPacketToPlayer(ServerPlayer player, CustomPacketPayload packet);
+
+    void sendPacketToAllPlayers(MinecraftServer server, CustomPacketPayload packet);
 }

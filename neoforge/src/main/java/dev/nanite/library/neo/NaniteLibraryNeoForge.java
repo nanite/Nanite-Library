@@ -1,6 +1,9 @@
 package dev.nanite.library.neo;
 
 import dev.nanite.library.NaniteLibrary;
+import dev.nanite.library.neo.core.network.NetworkRegistryNeoForge;
+import dev.nanite.library.neo.platform.PlatformNeoForge;
+import dev.nanite.library.platform.Platform;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.neoforged.bus.api.Event;
@@ -13,6 +16,8 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,14 +35,22 @@ public class NaniteLibraryNeoForge {
 
     private final NaniteLibrary library;
 
-    public NaniteLibraryNeoForge(IEventBus eventBus) {
+    public NaniteLibraryNeoForge(IEventBus modEventBus) {
         library = new NaniteLibrary();
 
-        eventBus.addListener(this::commonSetup);
+        modEventBus.addListener(this::commonSetup);
+        modEventBus.addListener(this::onNetworkRegister);
 
         NeoForge.EVENT_BUS.addListener(this::onAddServerReloadListener);
         NeoForge.EVENT_BUS.addListener(this::onServerStarting);
         NeoForge.EVENT_BUS.addListener(this::onPlayerJoin);
+    }
+
+    private void onNetworkRegister(RegisterPayloadHandlersEvent event) {
+        // TODO: this isn't technically the correct way of doing it as it's a mod event bus so it's bound to this library mod.
+        PayloadRegistrar registrar = event.registrar("1");
+        // This is safe! This will always be the correct type on neoforge.
+        ((NetworkRegistryNeoForge) Platform.INSTANCE.network()).collectPackets(registrar);
     }
 
     private void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
