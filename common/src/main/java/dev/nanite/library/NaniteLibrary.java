@@ -10,6 +10,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
+import java.util.Locale;
+
 public class NaniteLibrary {
     public static final String MOD_ID = "nanitelibrary";
 
@@ -31,8 +33,9 @@ public class NaniteLibrary {
 
         // Sync the 'common' configs back to the client from the server to ensure both sides have the same values.
         for (Config config : ConfigManager.get().getConfigsByType(ConfigType.COMMON)) {
+            System.out.println("Syncing config " + config.getModId() + "_" + config.getConfigType().toString().toLowerCase(Locale.ROOT) + " to player " + entity.getName().getString());
             // TODO: Pipe in how this will send.
-            Platform.INSTANCE.sendPacketToPlayer((ServerPlayer) entity, new ConfigSyncPacket(config));
+//            Platform.INSTANCE.sendPacketToPlayer((ServerPlayer) entity, new ConfigSyncPacket(config.));
         }
     }
 
