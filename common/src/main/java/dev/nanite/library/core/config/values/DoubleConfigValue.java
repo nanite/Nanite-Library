@@ -9,6 +9,21 @@ public class DoubleConfigValue extends NumberConfigValue<Double> {
     }
 
     @Override
+    public DoubleConfigValue comments(String... comments) {
+        return (DoubleConfigValue) super.comments(comments);
+    }
+
+    @Override
+    public DoubleConfigValue min(Double min) {
+        return (DoubleConfigValue) super.min(min);
+    }
+
+    @Override
+    public DoubleConfigValue max(Double max) {
+        return (DoubleConfigValue) super.max(max);
+    }
+
+    @Override
     protected Double readNumber(Json5Primitive primitive) {
         return primitive.getAsDouble();
     }

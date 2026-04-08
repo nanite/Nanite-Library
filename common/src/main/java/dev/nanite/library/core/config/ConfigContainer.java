@@ -1,17 +1,14 @@
 package dev.nanite.library.core.config;
 
+import com.mojang.datafixers.util.Either;
 import de.marhali.json5.Json5Element;
 import de.marhali.json5.Json5Object;
 import de.marhali.json5.Json5Primitive;
 import dev.nanite.library.core.config.values.*;
-import dev.nanite.library.utils.RegistryReference;
 import net.minecraft.core.Registry;
-import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.material.Fluid;
+import net.minecraft.tags.TagKey;
 import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
@@ -175,6 +172,59 @@ public class ConfigContainer {
         );
     }
 
+    public <T> ConfigValue<Either<Identifier, TagKey<T>>> idOrTagValue(String key, ResourceKey<Registry<T>> registry, Either<Identifier, TagKey<T>> defaultValue) {
+        return new ConfigValue<>(owner, key, defaultValue) {
+            @Override
+            public Either<Identifier, TagKey<T>> deserialize(Json5Element element) {
+                return deserializeIdOrTag(registry, element);
+            }
+
+            @Override
+            public Json5Element serialize() {
+                return serializeIdOrTag(get());
+            }
+        };
+    }
+
+    public <T> ConfigValue<List<Either<Identifier, TagKey<T>>>> idOrTagListValue(String key, ResourceKey<Registry<T>> registry, List<Either<Identifier, TagKey<T>>> defaultValue) {
+        return listValue(
+            key,
+            defaultValue,
+            element -> deserializeIdOrTag(registry, element),
+            ConfigContainer::serializeIdOrTag
+        );
+    }
+
+    private static <T> Either<Identifier, TagKey<T>> deserializeIdOrTag(ResourceKey<Registry<T>> registry, Json5Element element) {
+        if (element instanceof Json5Primitive primitive && primitive.isString()) {
+            String str = primitive.getAsString();
+            if (str.startsWith("#")) {
+                String tagLocation = str.substring(1);
+                Identifier location = Identifier.tryParse(tagLocation);
+                if (location == null) {
+                    throw new IllegalArgumentException("Invalid tag identifier: " + tagLocation);
+                }
+
+                return Either.right(TagKey.create(registry, location));
+            } else {
+                Identifier id = Identifier.tryParse(str);
+                if (id == null) {
+                    throw new IllegalArgumentException("Invalid identifier: " + str);
+                }
+                return Either.left(id);
+            }
+        }
+
+        throw new IllegalArgumentException("Expected string value for Identifier or TagKey");
+    }
+
+    private static <T> Json5Element serializeIdOrTag(Either<Identifier, TagKey<T>> value) {
+        return value.map(
+            id -> Json5Primitive.fromString(id.toString()),
+            tag -> Json5Primitive.fromString("#" + tag.location())
+        );
+    }
+
     public ConfigValueGroup group(String key) {
         ConfigValueGroup group = new ConfigValueGroup(owner, key);
         values.put(key, group);
@@ -185,35 +235,6 @@ public class ConfigContainer {
         EnumConfigValue<E> value = new EnumConfigValue<>(owner, key, defaultValue);
         values.put(key, value);
         return value;
-    }
-
-    // Registry reference factory methods
-    public <T> RegistryReferenceConfigValue<T> registryValue(
-            String key, 
-            RegistryReference<T> defaultValue,
-            ResourceKey<? extends Registry<T>> registryKey
-    ) {
-        RegistryReferenceConfigValue<T> value = new RegistryReferenceConfigValue<>(owner, key, defaultValue, registryKey);
-        values.put(key, value);
-        return value;
-    }
-
-    public <T> ConfigValue<List<RegistryReference<T>>> registryListValue(
-            String key, 
-            List<RegistryReference<T>> defaultValue,
-            ResourceKey<? extends Registry<T>> registryKey
-    ) {
-        return listValue(
-            key,
-            defaultValue,
-            element -> {
-                if (element instanceof Json5Primitive primitive) {
-                    return RegistryReference.parse(primitive.getAsString(), registryKey);
-                }
-                throw new IllegalArgumentException("Expected string for registry reference");
-            },
-            ref -> Json5Primitive.fromString(ref.toString())
-        );
     }
 
     /// Generic map factory - keys are always strings, custom value serialization

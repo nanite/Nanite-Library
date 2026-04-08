@@ -2,6 +2,8 @@ package dev.nanite.library.fabric;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import dev.nanite.library.NaniteLibrary;
@@ -14,5 +16,7 @@ public class NaniteLibraryFabric implements ModInitializer {
         var library = new NaniteLibrary();
 
         ServerPlayerEvents.JOIN.register(library::onPlayerJoin);
+
+        ServerLifecycleEvents.SERVER_STARTED.register(library::onServerStarted);
     }
 }

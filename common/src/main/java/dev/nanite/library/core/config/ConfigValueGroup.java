@@ -45,7 +45,7 @@ public class ConfigValueGroup extends ConfigValue<ConfigValueGroup> implements I
     public Json5Element serialize() {
         // First, serialize all child values into the container's data
         for (Map.Entry<String, ConfigValue<?>> entry : container.getValues().entrySet()) {
-            container.saveValue(entry.getKey(), entry.getValue().serialize());
+            container.saveValue(entry.getKey(), entry.getValue().serializeWithComments());
         }
         
         // Return the populated data object (comments will be added by serializeWithComments())

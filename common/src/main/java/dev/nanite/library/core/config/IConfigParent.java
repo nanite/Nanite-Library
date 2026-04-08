@@ -2,13 +2,6 @@ package dev.nanite.library.core.config;
 
 import de.marhali.json5.Json5Element;
 import dev.nanite.library.core.config.values.*;
-import dev.nanite.library.utils.RegistryReference;
-import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.material.Fluid;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
@@ -87,23 +80,6 @@ public interface IConfigParent {
     // Enum factory method
     default <E extends Enum<E>> EnumConfigValue<E> enumValue(String key, E defaultValue) {
         return getContainer().enumValue(key, defaultValue);
-    }
-
-    // Registry reference factory methods
-    default <T> RegistryReferenceConfigValue<T> registryValue(
-            String key, 
-            RegistryReference<T> defaultValue,
-            ResourceKey<? extends Registry<T>> registryKey
-    ) {
-        return getContainer().registryValue(key, defaultValue, registryKey);
-    }
-
-    default <T> ConfigValue<List<RegistryReference<T>>> registryListValue(
-            String key, 
-            List<RegistryReference<T>> defaultValue,
-            ResourceKey<? extends Registry<T>> registryKey
-    ) {
-        return getContainer().registryListValue(key, defaultValue, registryKey);
     }
 
     // Map factory methods - keys are always strings

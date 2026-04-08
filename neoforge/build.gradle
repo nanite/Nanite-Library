@@ -13,11 +13,13 @@ neoForge {
 
         client {
             client()
+            gameDirectory = file('run/client')
         }
 
         server {
             server()
             programArgument '--nogui'
+            gameDirectory = file('run/server')
         }
     }
 

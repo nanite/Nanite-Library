@@ -2,19 +2,17 @@ package dev.nanite.library.neo;
 
 import dev.nanite.library.NaniteLibrary;
 import dev.nanite.library.neo.core.network.NetworkRegistryNeoForge;
-import dev.nanite.library.neo.platform.PlatformNeoForge;
 import dev.nanite.library.platform.Platform;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
-import net.neoforged.bus.api.Event;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 //import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
@@ -44,6 +42,12 @@ public class NaniteLibraryNeoForge {
         NeoForge.EVENT_BUS.addListener(this::onAddServerReloadListener);
         NeoForge.EVENT_BUS.addListener(this::onServerStarting);
         NeoForge.EVENT_BUS.addListener(this::onPlayerJoin);
+
+        NeoForge.EVENT_BUS.addListener(this::serverStarted);
+    }
+
+    private void serverStarted(ServerStartedEvent event) {
+        library.onServerStarted(event.getServer());
     }
 
     private void onNetworkRegister(RegisterPayloadHandlersEvent event) {

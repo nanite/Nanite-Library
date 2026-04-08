@@ -4,6 +4,7 @@ import de.marhali.json5.Json5;
 import de.marhali.json5.Json5Element;
 import de.marhali.json5.Json5Object;
 import de.marhali.json5.exception.Json5Exception;
+import dev.nanite.library.platform.Platform;
 import dev.nanite.standard.utils.Lazy;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -27,13 +28,14 @@ public class Config implements IConfigParent {
     private final String metaName;
     private final ConfigContainer container;
 
-    private final Lazy<Path> configPath = Lazy.of(this::computeConfigPath);
+    private final String fileName;
 
     private Config(String modId, @Nullable String metaName, ConfigType configType) {
         this.modId = modId;
         this.metaName = metaName;
         this.container = new ConfigContainer(this);
         this.configType = configType;
+        this.fileName = this.computeFileName();
     }
 
     private Config(String modId, ConfigType configType) {
@@ -70,22 +72,30 @@ public class Config implements IConfigParent {
         return configType;
     }
 
-    private Path computeConfigPath() {
+    private String computeFileName() {
         StringBuilder fileNameBuilder = new StringBuilder(modId);
 
         if (metaName != null && !metaName.isEmpty()) {
             fileNameBuilder.append("_").append(metaName);
         }
 
-        fileNameBuilder
+        return fileNameBuilder
+                .append("-")
                 .append(this.configType.toString().toLowerCase())
-                .append(".json5");
+                .append(".json5")
+                .toString();
+    }
 
-        return Path.of("config", fileNameBuilder.toString());
+    public String fileName() {
+        return fileName;
+    }
+
+    public Path path() {
+        return Platform.INSTANCE.configPath().resolve(fileName);
     }
 
     public void load() {
-        Path path = configPath.get();
+        Path path = this.path();
 
         // Create config directory if it doesn't exist
         try {
@@ -99,7 +109,8 @@ public class Config implements IConfigParent {
         }
 
         // Load from disk if file exists
-        if (Files.exists(path)) {
+        var exists = Files.exists(path);
+        if (exists) {
             try {
                 String content = Files.readString(path);
                 Json5Element element = new Json5().parse(content);
@@ -129,8 +140,17 @@ public class Config implements IConfigParent {
         save();
     }
 
+    public void loadFromJsonPayload(Json5Object object) {
+        // Copy loaded data into container
+        for (String key : object.keySet()) {
+            container.getData().add(key, object.get(key));
+        }
+
+        container.loadValues();
+    }
+
     public void save() {
-        Path path = configPath.get();
+        Path path = this.path();
 
         try {
             // Ensure parent directory exists

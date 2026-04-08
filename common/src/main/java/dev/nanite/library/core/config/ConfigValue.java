@@ -48,10 +48,6 @@ public abstract class ConfigValue<T> implements Supplier<T> {
     }
 
     public void load() {
-        if (loaded) {
-            return;
-        }
-
         Json5Element value = this.parent.getValue(key);
         if (value != null) {
             try {

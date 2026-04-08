@@ -1,42 +1,31 @@
 package dev.nanite.library.network;
 
-import de.marhali.json5.Json5;
-import de.marhali.json5.Json5Element;
 import de.marhali.json5.Json5Object;
 import dev.nanite.library.NaniteLibrary;
+import dev.nanite.library.core.config.Config;
+import dev.nanite.library.core.config.ConfigManager;
+import dev.nanite.library.core.config.ConfigType;
 import dev.nanite.library.core.network.ClientPacketContext;
+import dev.nanite.library.utils.ExtraStreamCodecs;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
+import java.util.Optional;
 
-public record ConfigSyncPacket(Json5Object config) implements CustomPacketPayload {
+public record ConfigSyncPacket(String fileName, Json5Object config) implements CustomPacketPayload {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConfigSyncPacket.class);
+
     public static final Type<ConfigSyncPacket> TYPE = new Type<>(NaniteLibrary.id("config_sync"));
 
     public static final StreamCodec<ByteBuf, ConfigSyncPacket> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8,
-            ConfigSyncPacket::serializeConfig,
-            ConfigSyncPacket::deserializeConfig
+            ByteBufCodecs.STRING_UTF8, ConfigSyncPacket::fileName,
+            ExtraStreamCodecs.JSON5_OBJECT, ConfigSyncPacket::config,
+            ConfigSyncPacket::new
     );
-
-    private static String serializeConfig(ConfigSyncPacket packet) {
-        try {
-            return new Json5().serialize(packet.config());
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to serialize config", e);
-        }
-    }
-
-    private static ConfigSyncPacket deserializeConfig(String json) {
-        Json5Element element = new Json5().parse(json);
-        if (element instanceof Json5Object obj) {
-            return new ConfigSyncPacket(obj);
-        }
-
-        throw new RuntimeException("Expected Json5Object, got " + element.getClass().getSimpleName());
-    }
 
     @Override
     public Type<? extends CustomPacketPayload> type() {
@@ -44,6 +33,15 @@ public record ConfigSyncPacket(Json5Object config) implements CustomPacketPayloa
     }
 
     public void handle(ClientPacketContext clientPacketContext) {
-        // This happens on the client. We want to update the config.
+        Optional<Config> selectedConfig = ConfigManager.get().getConfigsByType(ConfigType.COMMON).stream()
+                .filter(e -> e.fileName().equals(fileName))
+                .findFirst();
+
+        if (selectedConfig.isEmpty()) {
+            LOGGER.warn("Received config sync packet for unknown config file: {}", fileName);
+            return;
+        }
+
+        selectedConfig.get().loadFromJsonPayload(config);
     }
 }

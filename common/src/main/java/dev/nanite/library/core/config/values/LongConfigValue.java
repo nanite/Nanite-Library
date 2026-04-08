@@ -9,6 +9,21 @@ public class LongConfigValue extends NumberConfigValue<Long> {
     }
 
     @Override
+    public LongConfigValue comments(String... comments) {
+        return (LongConfigValue) super.comments(comments);
+    }
+
+    @Override
+    public LongConfigValue min(Long min) {
+        return (LongConfigValue) super.min(min);
+    }
+
+    @Override
+    public LongConfigValue max(Long max) {
+        return (LongConfigValue) super.max(max);
+    }
+
+    @Override
     protected Long readNumber(Json5Primitive primitive) {
         return primitive.getAsLong();
     }
