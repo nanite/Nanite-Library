@@ -1,7 +1,12 @@
 package dev.nanite.library.core.config;
 
+import com.mojang.datafixers.util.Either;
 import de.marhali.json5.Json5Element;
 import dev.nanite.library.core.config.values.*;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.TagKey;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
@@ -94,6 +99,14 @@ public interface IConfigParent {
 
     default MapConfigValue<String, String> stringMapValue(String key, Map<String, String> defaultValue) {
         return getContainer().stringMapValue(key, defaultValue);
+    }
+
+    default <T> ConfigValue<Either<Identifier, TagKey<T>>> idOrTagValue(String key, ResourceKey<Registry<T>> registry, Either<Identifier, TagKey<T>> defaultValue) {
+        return getContainer().idOrTagValue(key, registry, defaultValue);
+    }
+
+    default <T> ConfigValue<List<Either<Identifier, TagKey<T>>>> idOrTagListValue(String key, ResourceKey<Registry<T>> registry, List<Either<Identifier, TagKey<T>>> defaultValue) {
+        return getContainer().idOrTagListValue(key, registry, defaultValue);
     }
 
     // Group factory method
