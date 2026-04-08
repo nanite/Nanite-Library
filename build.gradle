@@ -42,11 +42,7 @@ subprojects {
         archivesName = "${archives_base_name}-$project.name"
     }
 
-    if (project.name == "standard") {
-        return
-    }
-
-    if (project.name != "common") {
+    if (project.name != "common" && project.name != "standard") {
         dependencies {
             api project(":common")
             api project(":standard")
