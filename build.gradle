@@ -104,7 +104,7 @@ publishMods {
 
     def createOptions = (String modloader) -> publishOptions {
         file = project.provider { project(":${modloader}").tasks.jar }.flatMap { it.archiveFile }
-        displayName = "${project.name} ${modloader.capitalize()} ${mod_version}"
+        displayName = "Nanite Library ${modloader.capitalize()} ${mod_version}"
         modLoaders.add(modloader)
     }
 
