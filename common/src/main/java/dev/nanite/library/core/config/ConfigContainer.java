@@ -172,59 +172,6 @@ public class ConfigContainer {
         );
     }
 
-    public <T> ConfigValue<Either<Identifier, TagKey<T>>> idOrTagValue(String key, ResourceKey<Registry<T>> registry, Either<Identifier, TagKey<T>> defaultValue) {
-        return new ConfigValue<>(owner, key, defaultValue) {
-            @Override
-            public Either<Identifier, TagKey<T>> deserialize(Json5Element element) {
-                return deserializeIdOrTag(registry, element);
-            }
-
-            @Override
-            public Json5Element serialize() {
-                return serializeIdOrTag(get());
-            }
-        };
-    }
-
-    public <T> ConfigValue<List<Either<Identifier, TagKey<T>>>> idOrTagListValue(String key, ResourceKey<Registry<T>> registry, List<Either<Identifier, TagKey<T>>> defaultValue) {
-        return listValue(
-            key,
-            defaultValue,
-            element -> deserializeIdOrTag(registry, element),
-            ConfigContainer::serializeIdOrTag
-        );
-    }
-
-    private static <T> Either<Identifier, TagKey<T>> deserializeIdOrTag(ResourceKey<Registry<T>> registry, Json5Element element) {
-        if (element instanceof Json5Primitive primitive && primitive.isString()) {
-            String str = primitive.getAsString();
-            if (str.startsWith("#")) {
-                String tagLocation = str.substring(1);
-                Identifier location = Identifier.tryParse(tagLocation);
-                if (location == null) {
-                    throw new IllegalArgumentException("Invalid tag identifier: " + tagLocation);
-                }
-
-                return Either.right(TagKey.create(registry, location));
-            } else {
-                Identifier id = Identifier.tryParse(str);
-                if (id == null) {
-                    throw new IllegalArgumentException("Invalid identifier: " + str);
-                }
-                return Either.left(id);
-            }
-        }
-
-        throw new IllegalArgumentException("Expected string value for Identifier or TagKey");
-    }
-
-    private static <T> Json5Element serializeIdOrTag(Either<Identifier, TagKey<T>> value) {
-        return value.map(
-            id -> Json5Primitive.fromString(id.toString()),
-            tag -> Json5Primitive.fromString("#" + tag.location())
-        );
-    }
-
     public ConfigValueGroup group(String key) {
         ConfigValueGroup group = new ConfigValueGroup(owner, key);
         values.put(key, group);

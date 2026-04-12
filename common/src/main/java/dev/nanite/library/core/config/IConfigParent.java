@@ -101,14 +101,6 @@ public interface IConfigParent {
         return getContainer().stringMapValue(key, defaultValue);
     }
 
-    default <T> ConfigValue<Either<Identifier, TagKey<T>>> idOrTagValue(String key, ResourceKey<Registry<T>> registry, Either<Identifier, TagKey<T>> defaultValue) {
-        return getContainer().idOrTagValue(key, registry, defaultValue);
-    }
-
-    default <T> ConfigValue<List<Either<Identifier, TagKey<T>>>> idOrTagListValue(String key, ResourceKey<Registry<T>> registry, List<Either<Identifier, TagKey<T>>> defaultValue) {
-        return getContainer().idOrTagListValue(key, registry, defaultValue);
-    }
-
     // Group factory method
     default ConfigValueGroup group(String key) {
         return getContainer().group(key);
