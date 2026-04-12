@@ -59,9 +59,13 @@ subprojects {
             mod_name: mod_name,
             mod_author: mod_author,
             minecraft_version: minecraft_version,
+            minecraft_version_range_sem: minecraft_version_range_sem,
+            minecraft_version_range_mvn: minecraft_version_range_mvn,
             neoforge_version: neoforge_version,
+            neoforge_version_range: neoforge_version_range,
             fabric_loader_version: fabric_loader_version,
             fabric_api_version: fabric_api_version,
+            fabric_api_version_range: fabric_api_version_range,
             version: version,
     ]
 
@@ -111,13 +115,17 @@ publishMods {
     def curseForgeOptions = curseforgeOptions {
         accessToken = providers.environmentVariable("CURSE_TOKEN")
         projectId = "${curseforge_id}"
-        minecraftVersions.add("${minecraft_version}")
+        supported_minecraft_versions.split(",").each {
+            minecraftVersions.add(it.trim())
+        }
     }
 
     def modrinthOptions = modrinthOptions {
         accessToken = providers.environmentVariable("MODRINTH_TOKEN")
         projectId = "${modrinth_id}"
-        minecraftVersions.add("${minecraft_version}")
+        supported_minecraft_versions.split(",").each {
+            minecraftVersions.add(it.trim())
+        }
     }
 
     curseforge("curseforgeFabric") {
