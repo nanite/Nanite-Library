@@ -5,7 +5,6 @@ import de.marhali.json5.Json5Element;
 import de.marhali.json5.Json5Object;
 import de.marhali.json5.exception.Json5Exception;
 import dev.nanite.library.platform.Platform;
-import dev.nanite.standard.utils.Lazy;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -20,7 +20,7 @@ public class ConfigManager {
         ConfigManager instance = get();
         synchronized (instance.configs) {
             if (instance.loadedConfigTypes.contains(type)) {
-                throw new IllegalStateException("Cannot register " + type + " config after configs of that type have been loaded.");
+                throw new IllegalStateException("Cannot register " + type + " config after configs of that type have been loaded. You should register you config earlier in the mod loading process.");
             }
             instance.configs.computeIfAbsent(type, k ->
                     Collections.synchronizedList(new ArrayList<>())
@@ -29,10 +29,6 @@ public class ConfigManager {
     }
 
     public synchronized void loadConfigs(ConfigType type) {
-        if (loadedConfigTypes.contains(type)) {
-            throw new IllegalStateException("Configs of type " + type + " have already been loaded.");
-        }
-
         var configsByType = configs.get(type);
         if (configsByType == null) {
             return;
