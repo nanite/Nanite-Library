@@ -36,7 +36,7 @@ configurations {
 }
 
 dependencies {
-    jarJar(implementation("de.marhali:json5-java:3.0.0"))
+    jarJar(api("de.marhali:json5-java:3.0.0"))
 }
 
 java {
