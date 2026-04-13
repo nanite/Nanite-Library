@@ -13,7 +13,7 @@ allprojects {
     apply plugin: 'java-library'
     apply plugin: 'maven-publish'
 
-    version = mod_version + (isSnapshot ? "-SNAPSHOT" : "") + "-test-5"
+    version = mod_version + (isSnapshot ? "-SNAPSHOT" : "")
     group = maven_group
 
     tasks.withType(JavaCompile).configureEach {
@@ -106,9 +106,16 @@ subprojects {
     }
 }
 
+def changelogData = insaniamUtils.createChangelog {
+    file = file('CHANGELOG.md')
+    versionPattern = ~/## \[[^]]+]/
+    fallbackValue = "No changelog provided"
+    version = project.mod_version
+}
+
 publishMods {
     dryRun = providers.environmentVariable("CURSE_TOKEN").getOrNull() == null
-    changelog = file("./CHANGELOG.md").text
+    changelog = changelogData
     version = "${mod_version}"
     type = BETA
 

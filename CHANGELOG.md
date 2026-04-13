@@ -1,5 +1,11 @@
 # Changelog
 
+## [26.1.2.2]
+
+### Added
+* Helper methods to the registry to provide back the Identifier or the ResourceKey for the item/block properties
+* Added back the CreativeModeTabBuilder to bypass various issues with the vanilla one.
+
 ## [26.1.2.1]
 
 ### Fixed
