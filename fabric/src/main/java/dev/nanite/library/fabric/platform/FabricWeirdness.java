@@ -6,7 +6,7 @@ import net.minecraft.world.item.CreativeModeTab;
 
 public class FabricWeirdness implements Weirdness {
     @Override
-    public CreativeModeTab.Builder createItemGroupBuilder() {
+    public CreativeModeTab.Builder createVanillaCreativeModeTabBuilder() {
         return FabricCreativeModeTab.builder();
     }
 }

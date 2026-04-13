@@ -10,6 +10,7 @@ import net.minecraft.tags.TagKey;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class FabricRegistry<T> implements NaniteRegistry<T> {
@@ -37,14 +38,14 @@ public class FabricRegistry<T> implements NaniteRegistry<T> {
     }
 
     @Override
-    public <I extends T> RegistryHolder<T, I> register(String id, ConsumeWithIdentifier<I> value) {
+    public <I extends T> RegistryHolder<T, I> registerPassId(String id, Function<Identifier, I> value) {
         var identifier = Identifier.fromNamespaceAndPath(modId, id);
         FabricRegistryHolder<T, I> holder = new FabricRegistryHolder<>(identifier, value.apply(identifier));
         return this.register(holder);
     }
 
     @Override
-    public <I extends T> RegistryHolder<T, I> register(String id, ConsumeWithResourceKey<I, T> value) {
+    public <I extends T> RegistryHolder<T, I> registerPassKey(String id, Function<ResourceKey<T>, I> value) {
         var resourceKey = ResourceKey.create(backingRegistry.key(), Identifier.fromNamespaceAndPath(modId, id));
         FabricRegistryHolder<T, I> holder = new FabricRegistryHolder<>(resourceKey.identifier(), value.apply(resourceKey));
         return this.register(holder);

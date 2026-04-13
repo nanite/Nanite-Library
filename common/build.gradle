@@ -3,7 +3,7 @@ plugins {
 }
 
 loom {
-    accessWidenerPath.set(file("src/main/resources/${mod_id}.accesswidener"))
+    accessWidenerPath.set(file("src/main/resources/${mod_id}.classtweaker"))
 
     mixin {
         useLegacyMixinAp = false

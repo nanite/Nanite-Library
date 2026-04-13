@@ -6,7 +6,7 @@ fabricApi {
 }
 
 loom {
-    accessWidenerPath = project(":common").file("src/main/resources/nanitelibrary.accesswidener")
+    accessWidenerPath = project(":common").file("src/main/resources/nanitelibrary.classtweaker")
 
     mixin {
         useLegacyMixinAp = false

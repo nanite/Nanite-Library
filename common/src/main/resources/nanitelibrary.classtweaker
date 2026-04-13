@@ -1,0 +1,8 @@
+classTweaker v1 official
+
+# CreativeModeTab
+transitive-accessible class net/minecraft/world/item/CreativeModeTab$Type
+transitive-accessible class net/minecraft/world/item/CreativeModeTab$Output
+transitive-accessible class net/minecraft/world/item/CreativeModeTab$TabVisibility
+transitive-accessible class net/minecraft/world/item/CreativeModeTab$ItemDisplayBuilder
+transitive-accessible class net/minecraft/world/item/CreativeModeTab$Row

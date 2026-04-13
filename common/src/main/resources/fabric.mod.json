@@ -1,0 +1,7 @@
+{
+    "schemaVersion": 1,
+    "id": "${mod_id}",
+    "version": "${version}",
+    "name": "${mod_name}",
+    "accessWidener": "nanitelibrary.classtweaker"
+}

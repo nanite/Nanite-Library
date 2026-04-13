@@ -13,6 +13,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class NeoRegistry<T> implements NaniteRegistry<T> {
@@ -41,14 +42,14 @@ public class NeoRegistry<T> implements NaniteRegistry<T> {
     }
 
     @Override
-    public <I extends T> RegistryHolder<T, I> register(String id, ConsumeWithIdentifier<I> value) {
+    public <I extends T> RegistryHolder<T, I> registerPassId(String id, Function<Identifier, I> value) {
         var identifier = Identifier.fromNamespaceAndPath(this.modId, id);
         NeoRegistryHolder<T, I> holder = new NeoRegistryHolder<>(identifier, registry.register(id, value));
         return register(holder);
     }
 
     @Override
-    public <I extends T> RegistryHolder<T, I> register(String id, ConsumeWithResourceKey<I, T> value) {
+    public <I extends T> RegistryHolder<T, I> registerPassKey(String id, Function<ResourceKey<T>, I> value) {
         var resourceKey = ResourceKey.create(registry.getRegistryKey(), Identifier.fromNamespaceAndPath(this.modId, id));
         NeoRegistryHolder<T, I> holder = new NeoRegistryHolder<>(resourceKey.identifier(), registry.register(id, () -> value.apply(resourceKey)));
         return register(holder);

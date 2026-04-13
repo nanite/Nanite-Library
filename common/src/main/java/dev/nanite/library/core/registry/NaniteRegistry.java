@@ -24,9 +24,9 @@ public interface NaniteRegistry<T> {
 
     <I extends T> RegistryHolder<T, I> register(String id, Supplier<I> value);
 
-    <I extends T> RegistryHolder<T, I> register(String id, ConsumeWithIdentifier<I> value);
+    <I extends T> RegistryHolder<T, I> registerPassId(String id, Function<Identifier, I> value);
 
-    <I extends T> RegistryHolder<T, I> register(String id, ConsumeWithResourceKey<I, T> value);
+    <I extends T> RegistryHolder<T, I> registerPassKey(String id, Function<ResourceKey<T>, I> value);
 
     ImmutableList<RegistryHolder<T, ? extends T>> entries();
 
@@ -35,10 +35,4 @@ public interface NaniteRegistry<T> {
     }
 
     TagKey<T> createTagKey(String id);
-
-    @FunctionalInterface
-    interface ConsumeWithIdentifier<T> extends Function<Identifier, T> {}
-
-    @FunctionalInterface
-    interface ConsumeWithResourceKey<I extends T, T> extends Function<ResourceKey<T>, I> {}
 }

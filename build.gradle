@@ -13,7 +13,7 @@ allprojects {
     apply plugin: 'java-library'
     apply plugin: 'maven-publish'
 
-    version = mod_version + (isSnapshot ? "-SNAPSHOT" : "")
+    version = mod_version + (isSnapshot ? "-SNAPSHOT" : "") + "-test-5"
     group = maven_group
 
     tasks.withType(JavaCompile).configureEach {
@@ -50,7 +50,13 @@ subprojects {
 
         jar {
             from project(":standard").sourceSets.main.output
-            from project(":common").sourceSets.main.output
+            from(project(":common").sourceSets.main.output) {
+                eachFile { file ->
+                    if (file.name == 'fabric.mod.json') {
+                        file.exclude()
+                    }
+                }
+            }
         }
     }
 
