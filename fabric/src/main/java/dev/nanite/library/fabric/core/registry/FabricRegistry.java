@@ -5,6 +5,7 @@ import dev.nanite.library.core.registry.NaniteRegistry;
 import dev.nanite.library.core.registry.RegistryHolder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
 
 import java.util.ArrayList;
@@ -32,6 +33,24 @@ public class FabricRegistry<T> implements NaniteRegistry<T> {
     @Override
     public <I extends T> RegistryHolder<T, I> register(String id, Supplier<I> value) {
         FabricRegistryHolder<T, I> holder = new FabricRegistryHolder<>(Identifier.fromNamespaceAndPath(modId, id), value.get());
+        return this.register(holder);
+    }
+
+    @Override
+    public <I extends T> RegistryHolder<T, I> register(String id, ConsumeWithIdentifier<I> value) {
+        var identifier = Identifier.fromNamespaceAndPath(modId, id);
+        FabricRegistryHolder<T, I> holder = new FabricRegistryHolder<>(identifier, value.apply(identifier));
+        return this.register(holder);
+    }
+
+    @Override
+    public <I extends T> RegistryHolder<T, I> register(String id, ConsumeWithResourceKey<I, T> value) {
+        var resourceKey = ResourceKey.create(backingRegistry.key(), Identifier.fromNamespaceAndPath(modId, id));
+        FabricRegistryHolder<T, I> holder = new FabricRegistryHolder<>(resourceKey.identifier(), value.apply(resourceKey));
+        return this.register(holder);
+    }
+
+    private <I extends T> RegistryHolder<T, I> register(FabricRegistryHolder<T, I> holder) {
         Registry.register(backingRegistry, holder.identifier(), holder.get());
         entries.add(holder);
         return holder;

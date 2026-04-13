@@ -37,6 +37,24 @@ public class NeoRegistry<T> implements NaniteRegistry<T> {
     @Override
     public <I extends T> RegistryHolder<T, I> register(String id, Supplier<I> value) {
         NeoRegistryHolder<T, I> holder = new NeoRegistryHolder<>(Identifier.fromNamespaceAndPath(this.modId, id), registry.register(id, value));
+        return register(holder);
+    }
+
+    @Override
+    public <I extends T> RegistryHolder<T, I> register(String id, ConsumeWithIdentifier<I> value) {
+        var identifier = Identifier.fromNamespaceAndPath(this.modId, id);
+        NeoRegistryHolder<T, I> holder = new NeoRegistryHolder<>(identifier, registry.register(id, value));
+        return register(holder);
+    }
+
+    @Override
+    public <I extends T> RegistryHolder<T, I> register(String id, ConsumeWithResourceKey<I, T> value) {
+        var resourceKey = ResourceKey.create(registry.getRegistryKey(), Identifier.fromNamespaceAndPath(this.modId, id));
+        NeoRegistryHolder<T, I> holder = new NeoRegistryHolder<>(resourceKey.identifier(), registry.register(id, () -> value.apply(resourceKey)));
+        return register(holder);
+    }
+
+    private <I extends T> RegistryHolder<T, I> register(NeoRegistryHolder<T, I> holder) {
         entries.add(holder);
         return holder;
     }
