@@ -1,5 +1,10 @@
 # Changelog
 
+## [26.1.2.4]
+
+### Fixed
+* Fixed common jar still not being correctly marked as `api` for the `json5` dep
+
 ## [26.1.2.3]
 
 ### Fixed
