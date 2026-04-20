@@ -27,6 +27,11 @@ public class ListConfigValue<T> extends ConfigValue<List<T>> {
     }
 
     @Override
+    public ListConfigValue<T> comments(String... comments) {
+        return (ListConfigValue<T>) super.comments(comments);
+    }
+
+    @Override
     public List<T> deserialize(Json5Element element) {
         if (!(element instanceof Json5Array array)) {
             throw new IllegalArgumentException("Expected array for ListConfigValue");

@@ -12,8 +12,6 @@ import net.minecraft.world.entity.player.Player;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Locale;
-
 public class NaniteLibrary {
     private static final Logger LOGGER = LoggerFactory.getLogger(NaniteLibrary.class);
 
