@@ -1,5 +1,11 @@
 # Changelog
 
+## [26.1.2.3]
+
+### Fixed
+* Fixed an issue with dependencies being declared incorrectly on the common jar
+* Fixed an issue with the comment builder method on the `ListConfigValue` being incorrect
+
 ## [26.1.2.2]
 
 ### Added
