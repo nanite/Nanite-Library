@@ -13,7 +13,7 @@ allprojects {
     apply plugin: 'java-library'
     apply plugin: 'maven-publish'
 
-    version = mod_version + (isSnapshot ? "-SNAPSHOT" : "")
+    version = isSnapshot ? (minecraft_version + "-SNAPSHOT") : mod_version
     group = maven_group
 
     tasks.withType(JavaCompile).configureEach {
