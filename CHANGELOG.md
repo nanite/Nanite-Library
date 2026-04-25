@@ -1,5 +1,10 @@
 # Changelog
 
+## [26.1.2.5]
+
+### Fixed
+* Fabric Minecraft version range being incorrect causing load time issues.
+
 ## [26.1.2.4]
 
 ### Fixed
