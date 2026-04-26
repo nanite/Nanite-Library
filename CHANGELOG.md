@@ -1,5 +1,11 @@
 # Changelog
 
+## [26.1.2.6]
+
+### Fixed
+* Actually fixed the Fabric Minecraft version range being incorrect causing load time issues.
+* Added the correct description to the fabric mod metadata.
+
 ## [26.1.2.5]
 
 ### Fixed
