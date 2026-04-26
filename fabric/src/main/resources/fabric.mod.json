@@ -3,7 +3,7 @@
     "id": "${mod_id}",
     "version": "${version}",
     "name": "${mod_name}",
-    "description": "Template",
+    "description": "Library mod for the Nanite family of mods. Provides common code and utilities for the various Nanite mods, as well as a common APIs for cross-loader mods",
     "authors": [
         "${mod_author}"
     ],
