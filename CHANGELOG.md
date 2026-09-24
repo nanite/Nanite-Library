@@ -1,5 +1,10 @@
 # Changelog
 
+## [26.3.0.2]
+
+### Added
+* `TagKey<T> createKey(ResourceKey<Registry<T>> registryKey)` helper method to the RegistryHolder interface
+
 ## [26.3.0.1]
 
 ### Changed
