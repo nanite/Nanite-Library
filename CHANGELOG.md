@@ -1,5 +1,10 @@
 # Changelog
 
+## [26.3.0.5]
+
+### Fixed
+- Generics issues with createResourceKey return type... Whoops.
+
 ## [26.3.0.4]
 
 ### Added

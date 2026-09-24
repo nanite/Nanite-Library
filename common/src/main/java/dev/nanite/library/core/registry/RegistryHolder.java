@@ -21,11 +21,11 @@ public interface RegistryHolder<R, T extends R> extends Supplier<T> {
         return TagKey.create(registryKey, identifier());
     }
 
-    default ResourceKey<T> createResourceKey(ResourceKey<? extends Registry<T>> registryKey) {
+    default ResourceKey<R> createResourceKey(ResourceKey<? extends Registry<R>> registryKey) {
         return ResourceKey.create(registryKey, identifier());
     }
 
-    default ResourceKey<T> createResourceKey(Registry<T> registry) {
+    default ResourceKey<R> createResourceKey(Registry<R> registry) {
         return ResourceKey.create(registry.key(), identifier());
     }
 }
