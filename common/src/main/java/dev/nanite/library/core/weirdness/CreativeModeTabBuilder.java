@@ -8,7 +8,6 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.ItemLike;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -20,13 +19,13 @@ import java.util.function.Supplier;
 ///
 /// This is primarily needed for bypassing a bunch of the private / protected methods in vanilla
 public class CreativeModeTabBuilder {
-    private static final DisplayItemsGenerator EMPTY_DISPLAY_GENERATOR =
+    private static final CreativeModeTab.DisplayItemsGenerator EMPTY_DISPLAY_GENERATOR =
             (itemDisplayParameters, output) -> {};
 
     private final Component title;
     private Supplier<ItemStack> icon;
     private LinkedList<Supplier<Item>> items;
-    private DisplayItemsGenerator displayGenerator = EMPTY_DISPLAY_GENERATOR;
+    private CreativeModeTab.DisplayItemsGenerator displayGenerator = EMPTY_DISPLAY_GENERATOR;
 
     private boolean canScroll = true;
     private boolean showTitle = true;
@@ -70,7 +69,7 @@ public class CreativeModeTabBuilder {
         return this;
     }
 
-    public CreativeModeTabBuilder itemDisplay(DisplayItemsGenerator generator) {
+        public CreativeModeTabBuilder itemDisplay(CreativeModeTab.DisplayItemsGenerator generator) {
         if (this.items != null)
             throw new IllegalStateException("Cannot set both lazy and display generator");
 
@@ -116,40 +115,9 @@ public class CreativeModeTabBuilder {
                 }
             }));
         } else {
-            // We should be fine to dirty cast this back as they have the same signature
-            tab.displayItems((CreativeModeTab.DisplayItemsGenerator) this.displayGenerator);
+            tab.displayItems(this.displayGenerator);
         }
 
         return tab.build();
-    }
-
-    // Taken directly from vanilla
-    public interface Output {
-        void accept(final ItemStack stack, final CreativeModeTab.TabVisibility tabVisibility);
-
-        default void accept(final ItemStack stack) {
-            this.accept(stack, CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
-        }
-
-        default void accept(final ItemLike item, final CreativeModeTab.TabVisibility tabVisibility) {
-            this.accept(new ItemStack(item), tabVisibility);
-        }
-
-        default void accept(final ItemLike item) {
-            this.accept(new ItemStack(item), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
-        }
-
-        default void acceptAll(final Collection<ItemStack> stacks, final CreativeModeTab.TabVisibility tabVisibility) {
-            stacks.forEach((stack) -> this.accept(stack, tabVisibility));
-        }
-
-        default void acceptAll(final Collection<ItemStack> stacks) {
-            this.acceptAll(stacks, CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
-        }
-    }
-
-    @FunctionalInterface
-    public interface DisplayItemsGenerator {
-        void accept(CreativeModeTab.ItemDisplayParameters parameters, Output output);
     }
 }

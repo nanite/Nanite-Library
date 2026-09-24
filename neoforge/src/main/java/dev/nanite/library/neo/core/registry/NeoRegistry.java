@@ -20,6 +20,7 @@ public class NeoRegistry<T> implements NaniteRegistry<T> {
     private final String modId;
     private final List<RegistryHolder<T, ? extends T>> entries = new LinkedList<>();
     private final DeferredRegister<T> registry;
+    private boolean initialized = false;
 
     public NeoRegistry(String modId, ResourceKey<? extends Registry<T>> backingRegistry) {
         this.modId = modId;
@@ -31,6 +32,7 @@ public class NeoRegistry<T> implements NaniteRegistry<T> {
      */
     @Override
     public void initialize() {
+        this.initialized = true;
         registry.register(ModList.get().getModContainerById(this.modId)
                 .map(ModContainer::getEventBus).orElseThrow());
     }
@@ -56,6 +58,12 @@ public class NeoRegistry<T> implements NaniteRegistry<T> {
     }
 
     private <I extends T> RegistryHolder<T, I> register(NeoRegistryHolder<T, I> holder) {
+        // DeferredRegister would still accept this until RegisterEvent fires, but Fabric can't, so fail the same way on both
+        if (this.initialized) {
+            throw new IllegalStateException("Cannot register " + holder.identifier() + " after the registry has been initialized. " +
+                    "Make sure the class holding it is loaded before calling initialize()");
+        }
+
         entries.add(holder);
         return holder;
     }
