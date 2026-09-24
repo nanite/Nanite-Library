@@ -1,5 +1,17 @@
 # Changelog
 
+## [26.3.0.4]
+
+### Added
+- More helper methods for tag + resource key creation in the RegistryHolder interface
+  - `TagKey<R> createTagKey(Registry<R> registry)`
+  - `TagKey<R> createTagKey(ResourceKey<? extends Registry<R>> registryKey)`
+  - `ResourceKey<T> createResourceKey(ResourceKey<? extends Registry<T>> registryKey)`
+  - `ResourceKey<T> createResourceKey(Registry<T> registry)`
+
+### Removed
+- Removed the `createKey` method from the RegistryHolder interface as it was redundant with the new helper methods.
+
 ## [26.3.0.3]
 
 ### Fixed
