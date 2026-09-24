@@ -13,7 +13,7 @@ public interface RegistryHolder<R, T extends R> extends Supplier<T> {
 
     Identifier identifier();
 
-    default TagKey<T> createKey(ResourceKey<Registry<T>> registryKey) {
-        return TagKey.create(registryKey, identifier());
+    default TagKey<R> createKey(Registry<R> registry) {
+        return TagKey.create(registry.key(), identifier());
     }
 }

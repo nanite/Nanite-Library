@@ -1,5 +1,10 @@
 # Changelog
 
+## [26.3.0.3]
+
+### Fixed
+* Incorrect generics on the `createKey` method in the RegistryHolder interface (`TagKey<R> createKey(Registry<R> registry)`)
+
 ## [26.3.0.2]
 
 ### Added
