@@ -34,6 +34,7 @@ public class Lazy<T> implements Supplier<T> {
     public void invalidate() {
         synchronized (this) {
             created = false;
+            value = null;
         }
     }
 

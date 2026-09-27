@@ -38,7 +38,7 @@ public class PlatformNeoForge implements Platform {
 
     @Override
     public String getPlatformName() {
-        return "Neo";
+        return "NeoForge";
     }
 
     @Override
