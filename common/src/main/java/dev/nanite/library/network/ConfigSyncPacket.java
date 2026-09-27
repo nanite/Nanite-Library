@@ -33,6 +33,11 @@ public record ConfigSyncPacket(String fileName, Json5Object config) implements C
     }
 
     public void handle(ClientPacketContext clientPacketContext) {
+        // The integrated server shares these exact config instances, so there's nothing to sync
+        if (clientPacketContext.client().isLocalServer()) {
+            return;
+        }
+
         Optional<Config> selectedConfig = ConfigManager.get().getConfigsByType(ConfigType.COMMON).stream()
                 .filter(e -> e.fileName().equals(fileName))
                 .findFirst();

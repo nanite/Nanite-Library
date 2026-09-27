@@ -3,7 +3,6 @@ package dev.nanite.library.core.config;
 import com.google.common.collect.ImmutableList;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class ConfigManager {
     private static final ConfigManager INSTANCE = new ConfigManager();
@@ -12,41 +11,41 @@ public class ConfigManager {
         return INSTANCE;
     }
 
-    private final Map<ConfigType, List<Config>> configs = new ConcurrentHashMap<>();
-    private final Set<ConfigType> loadedConfigTypes = ConcurrentHashMap.newKeySet();
+    private final Map<ConfigType, List<Config>> configs = new EnumMap<>(ConfigType.class);
 
+    /// Common configs load as soon as they're registered, so their values are available during mod loading.
+    private final Set<ConfigType> loadedConfigTypes = EnumSet.of(ConfigType.COMMON);
+
+    /// Registers a config. If configs of its type have already been loaded, it's loaded immediately.
     public static void register(Config config) {
+        get().registerConfig(config);
+    }
+
+    private synchronized void registerConfig(Config config) {
         var type = config.getConfigType();
-        ConfigManager instance = get();
-        synchronized (instance.configs) {
-            if (instance.loadedConfigTypes.contains(type)) {
-                throw new IllegalStateException("Cannot register " + type + " config after configs of that type have been loaded. You should register you config earlier in the mod loading process.");
-            }
-            instance.configs.computeIfAbsent(type, k ->
-                    Collections.synchronizedList(new ArrayList<>())
-            ).add(config);
+        configs.computeIfAbsent(type, k -> new ArrayList<>()).add(config);
+
+        if (loadedConfigTypes.contains(type)) {
+            config.load();
         }
     }
 
     public synchronized void loadConfigs(ConfigType type) {
-        var configsByType = configs.get(type);
-        if (configsByType == null) {
-            return;
-        }
-
-        for (var config : configsByType) {
+        for (var config : configs.getOrDefault(type, List.of())) {
             config.load();
         }
 
         loadedConfigTypes.add(type);
     }
 
-    public ImmutableList<Config> getConfigsByType(ConfigType type) {
-        var configsByType = configs.get(type);
-        if (configsByType == null) {
-            return ImmutableList.of();
+    /// Drops values synced from a remote server and reloads the affected configs from disk.
+    public synchronized void restoreSyncedConfigs() {
+        for (var config : configs.getOrDefault(ConfigType.COMMON, List.of())) {
+            config.restoreFromDisk();
         }
+    }
 
-        return ImmutableList.copyOf(configsByType);
+    public synchronized ImmutableList<Config> getConfigsByType(ConfigType type) {
+        return ImmutableList.copyOf(configs.getOrDefault(type, List.of()));
     }
 }

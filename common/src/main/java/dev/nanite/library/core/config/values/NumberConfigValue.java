@@ -66,16 +66,17 @@ public abstract class NumberConfigValue<T extends Number & Comparable<T>> extend
     @Override
     public Json5Element serializeWithComments() {
         Json5Element json5Element = super.serializeWithComments();
-        String comment = json5Element.hasComment() ? json5Element.getComment() + "\n" : "";
+        String range = null;
         if (minValue != null && maxValue != null) {
-            comment += "Value must be between " + minValue + " and " + maxValue;
+            range = "Value must be between " + minValue + " and " + maxValue;
         } else if (minValue != null) {
-            comment += "Value must be at least " + minValue;
+            range = "Value must be at least " + minValue;
         } else if (maxValue != null) {
-            comment += "Value must be at most " + maxValue;
+            range = "Value must be at most " + maxValue;
         }
-        if (!comment.isEmpty()) {
-            json5Element.setComment(comment);
+
+        if (range != null) {
+            json5Element.setComment(json5Element.hasComment() ? json5Element.getComment() + "\n" + range : range);
         }
         return json5Element;
     }

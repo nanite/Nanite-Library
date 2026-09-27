@@ -18,6 +18,5 @@ public class NaniteLibraryFabric implements ModInitializer {
         ServerPlayerEvents.JOIN.register(library::onPlayerJoin);
 
         ServerLifecycleEvents.SERVER_STARTING.register(library::onServerStarting);
-        ServerLifecycleEvents.SERVER_STARTED.register(library::onServerStarted);
     }
 }

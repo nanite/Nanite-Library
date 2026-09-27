@@ -26,6 +26,14 @@ public abstract class ConfigValue<T> implements Supplier<T> {
         this.value = defaultValue;
     }
 
+    protected IConfigParent parent() {
+        return parent;
+    }
+
+    public String key() {
+        return key;
+    }
+
     public abstract T deserialize(Json5Element element);
 
     public abstract Json5Element serialize();
@@ -87,9 +95,10 @@ public abstract class ConfigValue<T> implements Supplier<T> {
             throw new IllegalArgumentException(errorMsg);
         }
         
-        T oldValue = this.value;
         this.value = value;
+        this.loaded = true;
         save();
+        this.parent.root().save();
     }
 
     @Override

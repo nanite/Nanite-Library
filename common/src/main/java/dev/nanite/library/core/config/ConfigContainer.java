@@ -11,7 +11,8 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
 import org.jspecify.annotations.Nullable;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -19,7 +20,7 @@ import java.util.function.Function;
 public class ConfigContainer {
     private final IConfigParent owner;
     private final Json5Object data = new Json5Object();
-    private final Map<String, ConfigValue<?>> values = new HashMap<>();
+    private final Map<String, ConfigValue<?>> values = new LinkedHashMap<>();
 
     public ConfigContainer(IConfigParent owner) {
         this.owner = owner;
@@ -41,40 +42,49 @@ public class ConfigContainer {
         data.add(key, element);
     }
 
-    public IntConfigValue intValue(String key, int defaultValue) {
-        IntConfigValue value = new IntConfigValue(owner, key, defaultValue);
+    public void clearData() {
+        for (String key : new ArrayList<>(data.keySet())) {
+            data.remove(key);
+        }
+    }
+
+    private <V extends ConfigValue<?>> V register(String key, V value) {
+        if (values.containsKey(key)) {
+            throw new IllegalArgumentException("Config key '" + key + "' is already registered");
+        }
+
         values.put(key, value);
         return value;
+    }
+
+    public IntConfigValue intValue(String key, int defaultValue) {
+        IntConfigValue value = new IntConfigValue(owner, key, defaultValue);
+        return register(key, value);
     }
 
     public StringConfigValue stringValue(String key, String defaultValue) {
         StringConfigValue value = new StringConfigValue(owner, key, defaultValue);
-        values.put(key, value);
-        return value;
+        return register(key, value);
     }
 
     public BooleanConfigValue booleanValue(String key, boolean defaultValue) {
         BooleanConfigValue value = new BooleanConfigValue(owner, key, defaultValue);
-        values.put(key, value);
-        return value;
+        return register(key, value);
     }
 
     public FloatConfigValue floatValue(String key, float defaultValue) {
         FloatConfigValue value = new FloatConfigValue(owner, key, defaultValue);
-        values.put(key, value);
-        return value;
+        return register(key, value);
     }
 
     public DoubleConfigValue doubleValue(String key, double defaultValue) {
         DoubleConfigValue value = new DoubleConfigValue(owner, key, defaultValue);
-        values.put(key, value);
-        return value;
+        return register(key, value);
     }
 
     public LongConfigValue longValue(String key, long defaultValue) {
         LongConfigValue value = new LongConfigValue(owner, key, defaultValue);
-        values.put(key, value);
-        return value;
+        return register(key, value);
     }
 
     public <T> ConfigValue<List<T>> listValue(
@@ -84,8 +94,7 @@ public class ConfigContainer {
             Function<T, Json5Element> elementSerializer
     ) {
         ListConfigValue<T> value = new ListConfigValue<>(owner, key, defaultValue, elementDeserializer, elementSerializer);
-        values.put(key, value);
-        return value;
+        return register(key, value);
     }
 
     public ConfigValue<List<String>> stringListValue(String key, List<String> defaultValue) {
@@ -174,14 +183,12 @@ public class ConfigContainer {
 
     public ConfigValueGroup group(String key) {
         ConfigValueGroup group = new ConfigValueGroup(owner, key);
-        values.put(key, group);
-        return group;
+        return register(key, group);
     }
 
     public <E extends Enum<E>> EnumConfigValue<E> enumValue(String key, E defaultValue) {
         EnumConfigValue<E> value = new EnumConfigValue<>(owner, key, defaultValue);
-        values.put(key, value);
-        return value;
+        return register(key, value);
     }
 
     /// Generic map factory - keys are always strings, custom value serialization
@@ -198,8 +205,7 @@ public class ConfigContainer {
             valueDeserializer, 
             valueSerializer
         );
-        values.put(key, value);
-        return value;
+        return register(key, value);
     }
 
     // Convenience methods for common map types

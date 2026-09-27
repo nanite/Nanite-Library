@@ -21,8 +21,10 @@ public class NaniteLibrary {
         Platform.INSTANCE.network().optional().play2Client(ConfigSyncPacket.TYPE, ConfigSyncPacket.STREAM_CODEC, ConfigSyncPacket::handle);
     }
 
+    /// Fired before worlds load, on both the dedicated and integrated server.
     public void onServerStarting(MinecraftServer server) {
         ConfigManager.get().loadConfigs(ConfigType.SERVER);
+        ConfigManager.get().loadConfigs(ConfigType.COMMON);
     }
 
     public void onPlayerJoin(Player entity) {
@@ -38,10 +40,5 @@ public class NaniteLibrary {
 
     public static Identifier id(String path) {
         return Identifier.fromNamespaceAndPath(MOD_ID, path);
-    }
-
-    // This happens on both the dedicated server and local client server.
-    public void onServerStarted(MinecraftServer server) {
-        ConfigManager.get().loadConfigs(ConfigType.COMMON);
     }
 }

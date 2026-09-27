@@ -13,8 +13,7 @@ import net.neoforged.neoforge.common.NeoForge;
 //import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.server.ServerStartedEvent;
-import net.neoforged.neoforge.event.server.ServerStartingEvent;
+import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import org.slf4j.Logger;
@@ -44,11 +43,6 @@ public class NaniteLibraryNeoForge {
         NeoForge.EVENT_BUS.addListener(this::onServerStarting);
         NeoForge.EVENT_BUS.addListener(this::onPlayerJoin);
 
-        NeoForge.EVENT_BUS.addListener(this::serverStarted);
-    }
-
-    private void serverStarted(ServerStartedEvent event) {
-        library.onServerStarted(event.getServer());
     }
 
     private void onNetworkRegister(RegisterPayloadHandlersEvent event) {
@@ -71,7 +65,8 @@ public class NaniteLibraryNeoForge {
 
     }
 
-    private void onServerStarting(ServerStartingEvent event) {
+    // ServerStartingEvent fires after worlds load, so use about-to-start to match Fabric's SERVER_STARTING
+    private void onServerStarting(ServerAboutToStartEvent event) {
         library.onServerStarting(event.getServer());
     }
 }

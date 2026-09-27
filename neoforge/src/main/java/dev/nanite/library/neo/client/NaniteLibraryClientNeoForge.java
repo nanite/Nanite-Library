@@ -8,6 +8,8 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
+import net.neoforged.neoforge.common.NeoForge;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -23,6 +25,7 @@ public class NaniteLibraryClientNeoForge {
         libraryClient = new NaniteLibraryClient();
 
         modEventBus.addListener(this::addReloadListeners);
+        NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut event) -> libraryClient.onDisconnect());
     }
 
     private void addReloadListeners(AddClientReloadListenersEvent event) {
