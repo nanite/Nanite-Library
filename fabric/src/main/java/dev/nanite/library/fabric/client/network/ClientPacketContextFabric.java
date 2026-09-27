@@ -1,4 +1,4 @@
-package dev.nanite.library.fabric.core.network;
+package dev.nanite.library.fabric.client.network;
 
 import dev.nanite.library.core.network.ClientPacketContext;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;

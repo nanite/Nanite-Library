@@ -18,11 +18,13 @@ public class NaniteLibrary {
     public static final String MOD_ID = "nanitelibrary";
 
     public NaniteLibrary() {
-        Platform.INSTANCE.network().play2Client(ConfigSyncPacket.TYPE, ConfigSyncPacket.STREAM_CODEC, ConfigSyncPacket::handle);
+        Platform.INSTANCE.network().optional().play2Client(ConfigSyncPacket.TYPE, ConfigSyncPacket.STREAM_CODEC, ConfigSyncPacket::handle);
     }
 
+    /// Fired before worlds load, on both the dedicated and integrated server.
     public void onServerStarting(MinecraftServer server) {
         ConfigManager.get().loadConfigs(ConfigType.SERVER);
+        ConfigManager.get().loadConfigs(ConfigType.COMMON);
     }
 
     public void onPlayerJoin(Player entity) {
@@ -32,16 +34,11 @@ public class NaniteLibrary {
 
         // Sync the 'common' configs back to the client from the server to ensure both sides have the same values.
         for (Config config : ConfigManager.get().getConfigsByType(ConfigType.COMMON)) {
-            Platform.INSTANCE.sendPacketToPlayer((ServerPlayer) entity, new ConfigSyncPacket(config.fileName(), config.getContainer().getData()));
+            Platform.INSTANCE.sendPacketToPlayer((ServerPlayer) entity, new ConfigSyncPacket(config.fileName(), config.getContainer().getData().deepCopy()));
         }
     }
 
     public static Identifier id(String path) {
         return Identifier.fromNamespaceAndPath(MOD_ID, path);
-    }
-
-    // This happens on both the dedicated server and local client server.
-    public void onServerStarted(MinecraftServer server) {
-        ConfigManager.get().loadConfigs(ConfigType.COMMON);
     }
 }

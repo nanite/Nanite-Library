@@ -29,6 +29,9 @@ public class Config implements IConfigParent {
 
     private final String fileName;
 
+    /// Set while this config holds values synced from a remote server, which must never be written to disk.
+    private boolean syncedFromServer = false;
+
     private Config(String modId, @Nullable String metaName, ConfigType configType) {
         this.modId = modId;
         this.metaName = metaName;
@@ -56,6 +59,11 @@ public class Config implements IConfigParent {
     @Override
     public ConfigContainer getContainer() {
         return container;
+    }
+
+    @Override
+    public Config root() {
+        return this;
     }
 
     public String getModId() {
@@ -107,6 +115,10 @@ public class Config implements IConfigParent {
             LOGGER.error("Failed to create config directory: {}", e.getMessage());
         }
 
+        // Start from a clean slate so keys removed from the file fall back to their defaults
+        container.clearData();
+        syncedFromServer = false;
+
         // Load from disk if file exists
         var exists = Files.exists(path);
         if (exists) {
@@ -139,8 +151,11 @@ public class Config implements IConfigParent {
         save();
     }
 
+    /// Applies values synced from a remote server. They stay in memory only until [#restoreFromDisk()].
     public void loadFromJsonPayload(Json5Object object) {
-        // Copy loaded data into container
+        container.clearData();
+        syncedFromServer = true;
+
         for (String key : object.keySet()) {
             container.getData().add(key, object.get(key));
         }
@@ -148,7 +163,23 @@ public class Config implements IConfigParent {
         container.loadValues();
     }
 
+    public boolean isSyncedFromServer() {
+        return syncedFromServer;
+    }
+
+    /// Drops any values synced from a remote server and reloads this config from disk.
+    public void restoreFromDisk() {
+        if (syncedFromServer) {
+            load();
+        }
+    }
+
     public void save() {
+        if (syncedFromServer) {
+            LOGGER.debug("Not saving {} as it holds values synced from the server", fileName);
+            return;
+        }
+
         Path path = this.path();
 
         try {
