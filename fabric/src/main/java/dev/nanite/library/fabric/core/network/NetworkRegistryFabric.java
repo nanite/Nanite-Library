@@ -19,6 +19,18 @@ public class NetworkRegistryFabric implements NetworkRegistry {
     @Nullable
     private Consumer<ClientReceiver<?>> clientBinder;
 
+    /// Fabric has no network version negotiation, so this is a no-op.
+    @Override
+    public NetworkRegistry versioned(String version) {
+        return this;
+    }
+
+    /// Fabric never refuses a connection over missing packets, so every packet is already optional.
+    @Override
+    public NetworkRegistry optional() {
+        return this;
+    }
+
     @Override
     public <T extends CustomPacketPayload> void play2Server(CustomPacketPayload.Type<T> type, StreamCodec<? super ByteBuf, T> streamCodec, ServerHandler<T> handler) {
         PayloadTypeRegistry.serverboundPlay().register(type, streamCodec);

@@ -2,6 +2,7 @@ package dev.nanite.library.neo;
 
 import dev.nanite.library.NaniteLibrary;
 import dev.nanite.library.neo.core.network.NetworkRegistryNeoForge;
+import dev.nanite.library.core.network.NetworkRegistry;
 import dev.nanite.library.platform.Platform;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
@@ -51,8 +52,8 @@ public class NaniteLibraryNeoForge {
     }
 
     private void onNetworkRegister(RegisterPayloadHandlersEvent event) {
-        // TODO: this isn't technically the correct way of doing it as it's a mod event bus so it's bound to this library mod.
-        PayloadRegistrar registrar = event.registrar("1");
+        // Every packet sets its own version and optionality, so the registrar's defaults here are only a base.
+        PayloadRegistrar registrar = event.registrar(NetworkRegistry.DEFAULT_VERSION);
         // This is safe! This will always be the correct type on neoforge.
         ((NetworkRegistryNeoForge) Platform.INSTANCE.network()).collectPackets(registrar);
     }

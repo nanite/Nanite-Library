@@ -18,7 +18,7 @@ public class NaniteLibrary {
     public static final String MOD_ID = "nanitelibrary";
 
     public NaniteLibrary() {
-        Platform.INSTANCE.network().play2Client(ConfigSyncPacket.TYPE, ConfigSyncPacket.STREAM_CODEC, ConfigSyncPacket::handle);
+        Platform.INSTANCE.network().optional().play2Client(ConfigSyncPacket.TYPE, ConfigSyncPacket.STREAM_CODEC, ConfigSyncPacket::handle);
     }
 
     public void onServerStarting(MinecraftServer server) {

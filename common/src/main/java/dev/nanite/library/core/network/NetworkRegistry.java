@@ -9,6 +9,13 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 /// Handlers always run on the main thread of the receiving side.
 /// Decoding happens beforehand on the network thread, so any heavy parsing belongs in the `StreamCodec`.
 public interface NetworkRegistry {
+    /// The version packets are registered with unless [#versioned(String)] is used.
+    String DEFAULT_VERSION = "1";
+
+    NetworkRegistry versioned(String version);
+
+    NetworkRegistry optional();
+
     /// Registers a custom packet to be sent from the client to the server.
     <T extends CustomPacketPayload> void play2Server(CustomPacketPayload.Type<T> type, StreamCodec<? super ByteBuf, T> streamCodec, ServerHandler<T> handler);
 

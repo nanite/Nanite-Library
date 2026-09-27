@@ -78,7 +78,9 @@ public class PlatformNeoForge implements Platform {
 
     @Override
     public void sendPacketToPlayer(ServerPlayer player, CustomPacketPayload packet) {
-        PacketDistributor.sendToPlayer(player, packet);
+        if (player.connection.hasChannel(packet)) {
+            PacketDistributor.sendToPlayer(player, packet);
+        }
     }
 
     @Override
