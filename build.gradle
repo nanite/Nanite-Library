@@ -137,6 +137,8 @@ publishMods {
         supported_minecraft_versions.split(",").each {
             minecraftVersions.add(it.trim())
         }
+        client = true
+        server = true
     }
 
     def modrinthOptions = modrinthOptions {
@@ -145,6 +147,7 @@ publishMods {
         supported_minecraft_versions.split(",").each {
             minecraftVersions.add(it.trim())
         }
+        environment = CLIENT_AND_SERVER
     }
 
     curseforge("curseforgeFabric") {
