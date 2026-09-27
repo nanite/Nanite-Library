@@ -17,6 +17,6 @@ public class PlatformClientNeoForge implements PlatformClient {
 
     @Override
     public void registerResourcePackReloadListeners(Map<Identifier, PreparableReloadListener> listeners) {
-        listeners.putAll(NaniteLibraryClientNeoForge.reloadListeners);
+        NaniteLibraryClientNeoForge.reloadListeners.putAll(listeners);
     }
 }
