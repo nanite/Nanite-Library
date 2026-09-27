@@ -8,7 +8,9 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.neoforged.fml.ModContainer;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModList;
+import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.LinkedList;
@@ -20,6 +22,7 @@ public class NeoRegistry<T> implements NaniteRegistry<T> {
     private final String modId;
     private final List<RegistryHolder<T, ? extends T>> entries = new LinkedList<>();
     private final DeferredRegister<T> registry;
+    private boolean initialized = false;
 
     public NeoRegistry(String modId, ResourceKey<? extends Registry<T>> backingRegistry) {
         this.modId = modId;
@@ -31,8 +34,16 @@ public class NeoRegistry<T> implements NaniteRegistry<T> {
      */
     @Override
     public void initialize() {
-        registry.register(ModList.get().getModContainerById(this.modId)
-                .map(ModContainer::getEventBus).orElseThrow());
+        this.initialized = true;
+        ModContainer container = ModList.get().getModContainerById(this.modId)
+                .<ModContainer>map(c -> c)
+                .orElseGet(() -> ModLoadingContext.get().getActiveContainer());
+        IEventBus eventBus = container == null ? null : container.getEventBus();
+        if (eventBus == null) {
+            throw new IllegalStateException("Registry for " + this.modId + " must be initialized during mod construction");
+        }
+
+        registry.register(eventBus);
     }
 
     @Override
@@ -56,6 +67,12 @@ public class NeoRegistry<T> implements NaniteRegistry<T> {
     }
 
     private <I extends T> RegistryHolder<T, I> register(NeoRegistryHolder<T, I> holder) {
+        // DeferredRegister would still accept this until RegisterEvent fires, but Fabric can't, so fail the same way on both
+        if (this.initialized) {
+            throw new IllegalStateException("Cannot register " + holder.identifier() + " after the registry has been initialized. " +
+                    "Make sure the class holding it is loaded before calling initialize()");
+        }
+
         entries.add(holder);
         return holder;
     }

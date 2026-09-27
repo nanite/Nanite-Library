@@ -24,12 +24,28 @@ public class ConfigValueGroup extends ConfigValue<ConfigValueGroup> implements I
     }
 
     @Override
+    public Config root() {
+        return parent().root();
+    }
+
+    @Override
+    public void load() {
+        // Missing from the file entirely, so reset the children to their defaults
+        if (parent().getValue(key()) == null) {
+            container.clearData();
+            container.loadValues();
+        }
+
+        super.load();
+    }
+
+    @Override
     public ConfigValueGroup deserialize(Json5Element element) {
         if (!(element instanceof Json5Object obj)) {
             throw new IllegalArgumentException("Expected a JSON object for ConfigValueGroup");
         }
 
-        // Copy data from deserialized object into our container's data
+        container.clearData();
         Json5Object data = container.getData();
         for (String key : obj.keySet()) {
             data.add(key, obj.get(key));

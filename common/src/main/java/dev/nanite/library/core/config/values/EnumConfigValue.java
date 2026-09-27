@@ -15,9 +15,7 @@ public class EnumConfigValue<E extends Enum<E>> extends ConfigValue<E> {
 
     public EnumConfigValue(IConfigParent parent, String key, E defaultValue) {
         super(parent, key, defaultValue);
-        @SuppressWarnings("unchecked")
-        Class<E> enumType = (Class<E>) defaultValue.getClass();
-        this.enumClass = enumType;
+        this.enumClass = defaultValue.getDeclaringClass();
     }
 
     public EnumConfigValue<E> caseInsensitive() {

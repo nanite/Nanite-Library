@@ -16,6 +16,9 @@ import java.util.function.Function;
 public interface IConfigParent {
     ConfigContainer getContainer();
 
+    /// The config file this parent belongs to.
+    Config root();
+
     default @Nullable Json5Element getValue(String key) {
         return getContainer().getValue(key);
     }

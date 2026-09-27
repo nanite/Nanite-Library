@@ -38,7 +38,7 @@ public class PlatformNeoForge implements Platform {
 
     @Override
     public String getPlatformName() {
-        return "Neo";
+        return "NeoForge";
     }
 
     @Override
@@ -78,11 +78,13 @@ public class PlatformNeoForge implements Platform {
 
     @Override
     public void sendPacketToPlayer(ServerPlayer player, CustomPacketPayload packet) {
-        PacketDistributor.sendToPlayer(player, packet);
+        if (player.connection.hasChannel(packet)) {
+            PacketDistributor.sendToPlayer(player, packet);
+        }
     }
 
     @Override
     public void sendPacketToAllPlayers(MinecraftServer server, CustomPacketPayload packet) {
-
+        server.getPlayerList().getPlayers().forEach(player -> sendPacketToPlayer(player, packet));
     }
 }

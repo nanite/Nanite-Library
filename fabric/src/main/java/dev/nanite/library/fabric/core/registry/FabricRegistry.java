@@ -16,50 +16,59 @@ import java.util.function.Supplier;
 public class FabricRegistry<T> implements NaniteRegistry<T> {
     private final String modId;
     private final Registry<T> backingRegistry;
-    private final List<RegistryHolder<T, ? extends T>> entries = new ArrayList<>();
+    private final List<FabricRegistryHolder<T, ? extends T>> entries = new ArrayList<>();
+    private boolean initialized = false;
 
     public FabricRegistry(String modId, Registry<T> backingRegistry) {
         this.modId = modId;
         this.backingRegistry = backingRegistry;
     }
 
-    /**
-     * Nothing happens here as fabric isn't stupid.
-     */
     @Override
     public void initialize() {
-        // No-op
+        if (this.initialized) {
+            throw new IllegalStateException("Registry " + this.backingRegistry.key().identifier() + " for " + this.modId + " has already been initialized");
+        }
+
+        this.initialized = true;
+        for (FabricRegistryHolder<T, ? extends T> holder : this.entries) {
+            holder.bind(this.backingRegistry);
+        }
     }
 
     @Override
     public <I extends T> RegistryHolder<T, I> register(String id, Supplier<I> value) {
-        FabricRegistryHolder<T, I> holder = new FabricRegistryHolder<>(Identifier.fromNamespaceAndPath(modId, id), value.get());
+        FabricRegistryHolder<T, I> holder = new FabricRegistryHolder<>(Identifier.fromNamespaceAndPath(modId, id), value);
         return this.register(holder);
     }
 
     @Override
     public <I extends T> RegistryHolder<T, I> registerPassId(String id, Function<Identifier, I> value) {
         var identifier = Identifier.fromNamespaceAndPath(modId, id);
-        FabricRegistryHolder<T, I> holder = new FabricRegistryHolder<>(identifier, value.apply(identifier));
+        FabricRegistryHolder<T, I> holder = new FabricRegistryHolder<>(identifier, () -> value.apply(identifier));
         return this.register(holder);
     }
 
     @Override
     public <I extends T> RegistryHolder<T, I> registerPassKey(String id, Function<ResourceKey<T>, I> value) {
         var resourceKey = ResourceKey.create(backingRegistry.key(), Identifier.fromNamespaceAndPath(modId, id));
-        FabricRegistryHolder<T, I> holder = new FabricRegistryHolder<>(resourceKey.identifier(), value.apply(resourceKey));
+        FabricRegistryHolder<T, I> holder = new FabricRegistryHolder<>(resourceKey.identifier(), () -> value.apply(resourceKey));
         return this.register(holder);
     }
 
     private <I extends T> RegistryHolder<T, I> register(FabricRegistryHolder<T, I> holder) {
-        Registry.register(backingRegistry, holder.identifier(), holder.get());
+        if (this.initialized) {
+            throw new IllegalStateException("Cannot register " + holder.identifier() + " after the registry has been initialized. " +
+                    "Make sure the class holding it is loaded before calling initialize()");
+        }
+
         entries.add(holder);
         return holder;
     }
 
     @Override
     public ImmutableList<RegistryHolder<T, ? extends T>> entries() {
-        return ImmutableList.copyOf(entries);
+        return ImmutableList.<RegistryHolder<T, ? extends T>>builder().addAll(entries).build();
     }
 
     /**

@@ -43,9 +43,15 @@ subprojects {
     }
 
     if (project.name != "common" && project.name != "standard") {
+        configurations {
+            bundled
+            compileClasspath.extendsFrom bundled
+            runtimeClasspath.extendsFrom bundled
+        }
+
         dependencies {
-            api project(":common")
-            api project(":standard")
+            bundled project(":common")
+            bundled project(":standard")
         }
 
         jar {
