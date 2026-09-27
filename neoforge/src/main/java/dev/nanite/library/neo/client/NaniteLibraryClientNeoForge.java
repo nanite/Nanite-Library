@@ -11,24 +11,36 @@ import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.common.NeoForge;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 @Mod(value = NaniteLibrary.MOD_ID, dist = Dist.CLIENT)
 public class NaniteLibraryClientNeoForge {
-    public static final Map<Identifier, PreparableReloadListener> reloadListeners = Collections.synchronizedMap(new HashMap<>());
+    private static final Map<Identifier, PreparableReloadListener> reloadListeners = new HashMap<>();
+    private static boolean reloadListenersCollected = false;
 
     private final NaniteLibraryClient libraryClient;
 
     public NaniteLibraryClientNeoForge(IEventBus modEventBus) {
         libraryClient = new NaniteLibraryClient();
 
-        modEventBus.addListener(this::addReloadListeners);
+        modEventBus.addListener(this::onAddReloadListeners);
         NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut event) -> libraryClient.onDisconnect());
     }
 
-    private void addReloadListeners(AddClientReloadListenersEvent event) {
-        reloadListeners.forEach(event::addListener);
+    // NeoForge freezes the client reload listeners after AddClientReloadListenersEvent, so late ones can't be applied
+    public static synchronized void addReloadListeners(Map<Identifier, PreparableReloadListener> listeners) {
+        if (reloadListenersCollected) {
+            throw new IllegalStateException("Client reload listeners must be registered during mod construction on NeoForge: " + listeners.keySet());
+        }
+
+        reloadListeners.putAll(listeners);
+    }
+
+    private void onAddReloadListeners(AddClientReloadListenersEvent event) {
+        synchronized (NaniteLibraryClientNeoForge.class) {
+            reloadListenersCollected = true;
+            reloadListeners.forEach(event::addListener);
+        }
     }
 }

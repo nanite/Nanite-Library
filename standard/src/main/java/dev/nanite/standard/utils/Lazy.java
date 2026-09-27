@@ -1,5 +1,7 @@
 package dev.nanite.standard.utils;
 
+import org.jspecify.annotations.Nullable;
+
 import java.util.function.Supplier;
 
 /**
@@ -10,8 +12,7 @@ import java.util.function.Supplier;
  * @param <T> the type of the value
  */
 public class Lazy<T> implements Supplier<T> {
-    private transient volatile boolean created = false;
-    private transient volatile T value;
+    private transient volatile @Nullable Holder<T> holder;
     private final transient Supplier<T> supplier;
 
     private Lazy(Supplier<T> supplier) {
@@ -20,22 +21,21 @@ public class Lazy<T> implements Supplier<T> {
 
     @Override
     public T get() {
-        if (!created) {
+        Holder<T> current = holder;
+        if (current == null) {
             synchronized (this) {
-                if (!created) {
-                    value = supplier.get();
-                    created = true;
+                current = holder;
+                if (current == null) {
+                    current = new Holder<>(supplier.get());
+                    holder = current;
                 }
             }
         }
-        return value;
+        return current.value;
     }
 
     public void invalidate() {
-        synchronized (this) {
-            created = false;
-            value = null;
-        }
+        holder = null;
     }
 
     /**
@@ -52,6 +52,10 @@ public class Lazy<T> implements Supplier<T> {
 
     @Override
     public String toString() {
-        return "Lazy(value=" + (created ? value : "not created") + ")";
+        Holder<T> current = holder;
+        return "Lazy(value=" + (current != null ? current.value : "not created") + ")";
+    }
+
+    private record Holder<T>(T value) {
     }
 }

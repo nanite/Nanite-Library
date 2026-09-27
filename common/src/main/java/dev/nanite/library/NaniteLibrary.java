@@ -34,7 +34,7 @@ public class NaniteLibrary {
 
         // Sync the 'common' configs back to the client from the server to ensure both sides have the same values.
         for (Config config : ConfigManager.get().getConfigsByType(ConfigType.COMMON)) {
-            Platform.INSTANCE.sendPacketToPlayer((ServerPlayer) entity, new ConfigSyncPacket(config.fileName(), config.getContainer().getData()));
+            Platform.INSTANCE.sendPacketToPlayer((ServerPlayer) entity, new ConfigSyncPacket(config.fileName(), config.getContainer().getData().deepCopy()));
         }
     }
 

@@ -8,7 +8,9 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.neoforged.fml.ModContainer;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModList;
+import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.LinkedList;
@@ -33,8 +35,15 @@ public class NeoRegistry<T> implements NaniteRegistry<T> {
     @Override
     public void initialize() {
         this.initialized = true;
-        registry.register(ModList.get().getModContainerById(this.modId)
-                .map(ModContainer::getEventBus).orElseThrow());
+        ModContainer container = ModList.get().getModContainerById(this.modId)
+                .<ModContainer>map(c -> c)
+                .orElseGet(() -> ModLoadingContext.get().getActiveContainer());
+        IEventBus eventBus = container == null ? null : container.getEventBus();
+        if (eventBus == null) {
+            throw new IllegalStateException("Registry for " + this.modId + " must be initialized during mod construction");
+        }
+
+        registry.register(eventBus);
     }
 
     @Override

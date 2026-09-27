@@ -53,7 +53,7 @@ public class CreativeModeTabBuilder {
         return this;
     }
 
-    /// Resolved each time the tab is populated, so entries registered after this builder was configured are included
+    /// Resolved each time the tab is populated. populateFromRegistry reads the registry's current entries, populateFromItems a copy of the given items
     public CreativeModeTabBuilder populateFromItems(Collection<Supplier<Item>> items) {
         if (this.displayGenerator != EMPTY_DISPLAY_GENERATOR)
             throw new IllegalStateException("Cannot set both lazy and display generator");
