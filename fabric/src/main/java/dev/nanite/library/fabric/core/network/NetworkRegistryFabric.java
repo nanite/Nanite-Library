@@ -1,6 +1,5 @@
 package dev.nanite.library.fabric.core.network;
 
-import dev.nanite.library.core.network.ExecutionTarget;
 import dev.nanite.library.core.network.NetworkRegistry;
 import io.netty.buffer.ByteBuf;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
@@ -21,26 +20,25 @@ public class NetworkRegistryFabric implements NetworkRegistry {
     private Consumer<ClientReceiver<?>> clientBinder;
 
     @Override
-    public <T extends CustomPacketPayload> void play2Server(CustomPacketPayload.Type<T> type, StreamCodec<? super ByteBuf, T> streamCodec, ServerHandler<T> handler, ExecutionTarget target) {
+    public <T extends CustomPacketPayload> void play2Server(CustomPacketPayload.Type<T> type, StreamCodec<? super ByteBuf, T> streamCodec, ServerHandler<T> handler) {
         PayloadTypeRegistry.serverboundPlay().register(type, streamCodec);
         this.registerServerReceiver(type, handler);
     }
 
     @Override
-    public <T extends CustomPacketPayload> void play2Client(CustomPacketPayload.Type<T> type, StreamCodec<? super ByteBuf, T> streamCodec, ClientHandler<T> handler, ExecutionTarget target) {
+    public <T extends CustomPacketPayload> void play2Client(CustomPacketPayload.Type<T> type, StreamCodec<? super ByteBuf, T> streamCodec, ClientHandler<T> handler) {
         PayloadTypeRegistry.clientboundPlay().register(type, streamCodec);
         this.registerClientReceiver(type, handler);
     }
 
     @Override
-    public <T extends CustomPacketPayload> void playBidirectional(CustomPacketPayload.Type<T> type, StreamCodec<? super ByteBuf, T> streamCodec, ClientHandler<T> clientHandler, ServerHandler<T> serverHandler, ExecutionTarget target) {
+    public <T extends CustomPacketPayload> void playBidirectional(CustomPacketPayload.Type<T> type, StreamCodec<? super ByteBuf, T> streamCodec, ClientHandler<T> clientHandler, ServerHandler<T> serverHandler) {
         // Fabric keeps separate payload registries per direction, so registering the type in both is valid.
-        this.play2Client(type, streamCodec, clientHandler, target);
-        this.play2Server(type, streamCodec, serverHandler, target);
+        this.play2Client(type, streamCodec, clientHandler);
+        this.play2Server(type, streamCodec, serverHandler);
     }
 
     private <T extends CustomPacketPayload> void registerServerReceiver(CustomPacketPayload.Type<T> type, ServerHandler<T> handler) {
-        // Packet thread execution targets are ignored on fabric.
         ServerPlayNetworking.registerGlobalReceiver(type, (payload, context) -> handler.onHandle(payload, new ServerPacketContextFabric(context)));
     }
 

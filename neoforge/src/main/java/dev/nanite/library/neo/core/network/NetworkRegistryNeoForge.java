@@ -1,6 +1,5 @@
 package dev.nanite.library.neo.core.network;
 
-import dev.nanite.library.core.network.ExecutionTarget;
 import dev.nanite.library.core.network.NetworkRegistry;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -17,19 +16,19 @@ public class NetworkRegistryNeoForge implements NetworkRegistry {
     private final List<RegisteredPacket<?>> packets = Collections.synchronizedList(new ArrayList<>());
 
     @Override
-    public <T extends CustomPacketPayload> void play2Server(CustomPacketPayload.Type<T> type, StreamCodec<? super ByteBuf, T> streamCodec, ServerHandler<T> handler, ExecutionTarget target) {
-        this.add(new RegisteredPacket<>(type, streamCodec, null, handler, target));
+    public <T extends CustomPacketPayload> void play2Server(CustomPacketPayload.Type<T> type, StreamCodec<? super ByteBuf, T> streamCodec, ServerHandler<T> handler) {
+        this.add(new RegisteredPacket<>(type, streamCodec, null, handler));
     }
 
     @Override
-    public <T extends CustomPacketPayload> void play2Client(CustomPacketPayload.Type<T> type, StreamCodec<? super ByteBuf, T> streamCodec, ClientHandler<T> handler, ExecutionTarget target) {
-        this.add(new RegisteredPacket<>(type, streamCodec, handler, null, target));
+    public <T extends CustomPacketPayload> void play2Client(CustomPacketPayload.Type<T> type, StreamCodec<? super ByteBuf, T> streamCodec, ClientHandler<T> handler) {
+        this.add(new RegisteredPacket<>(type, streamCodec, handler, null));
     }
 
     @Override
-    public <T extends CustomPacketPayload> void playBidirectional(CustomPacketPayload.Type<T> type, StreamCodec<? super ByteBuf, T> streamCodec, ClientHandler<T> clientHandler, ServerHandler<T> serverHandler, ExecutionTarget target) {
+    public <T extends CustomPacketPayload> void playBidirectional(CustomPacketPayload.Type<T> type, StreamCodec<? super ByteBuf, T> streamCodec, ClientHandler<T> clientHandler, ServerHandler<T> serverHandler) {
         // NeoForge only allows a payload type to be registered once, so both handlers must go through playBidirectional
-        this.add(new RegisteredPacket<>(type, streamCodec, clientHandler, serverHandler, target));
+        this.add(new RegisteredPacket<>(type, streamCodec, clientHandler, serverHandler));
     }
 
     private void add(RegisteredPacket<?> packet) {
@@ -45,7 +44,6 @@ public class NetworkRegistryNeoForge implements NetworkRegistry {
     }
 
     private <T extends CustomPacketPayload> void registerPacket(PayloadRegistrar registrar, RegisteredPacket<T> packet) {
-        // TODO: Handle execution target here
         IPayloadHandler<T> clientHandler = packet.clientHandler == null ? null : (payload, context) ->
                 packet.clientHandler.onHandle(payload, new ClientPacketContextNeoForge(context));
         IPayloadHandler<T> serverHandler = packet.serverHandler == null ? null : (payload, context) ->
@@ -62,6 +60,6 @@ public class NetworkRegistryNeoForge implements NetworkRegistry {
 
     /// Represents a registered packet, containing all necessary information for encoding, decoding, and handling the packet on both the client and server
     /// for when the packets are collected by neoforges registry event.
-    public record RegisteredPacket<T extends CustomPacketPayload>(CustomPacketPayload.Type<T> type, StreamCodec<? super ByteBuf, T> streamCodec, @Nullable ClientHandler<T> clientHandler, @Nullable ServerHandler<T> serverHandler, ExecutionTarget target) {
+    public record RegisteredPacket<T extends CustomPacketPayload>(CustomPacketPayload.Type<T> type, StreamCodec<? super ByteBuf, T> streamCodec, @Nullable ClientHandler<T> clientHandler, @Nullable ServerHandler<T> serverHandler) {
     }
 }

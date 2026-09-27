@@ -5,30 +5,39 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 
 /// Network packet registry used to register custom packets for various directions.
+///
+/// Handlers always run on the main thread of the receiving side.
+/// Decoding happens beforehand on the network thread, so any heavy parsing belongs in the `StreamCodec`.
 public interface NetworkRegistry {
     /// Registers a custom packet to be sent from the client to the server.
-    /// This will, by default, execute the handler on the main thread, but you can specify a different execution target if needed.
-    default <T extends CustomPacketPayload> void play2Server(CustomPacketPayload.Type<T> type, StreamCodec<? super ByteBuf, T> streamCodec, ServerHandler<T> handler) {
-        play2Server(type, streamCodec, handler, ExecutionTarget.MAIN);
-    }
+    <T extends CustomPacketPayload> void play2Server(CustomPacketPayload.Type<T> type, StreamCodec<? super ByteBuf, T> streamCodec, ServerHandler<T> handler);
 
-    <T extends CustomPacketPayload> void play2Server(CustomPacketPayload.Type<T> type, StreamCodec<? super ByteBuf, T> streamCodec, ServerHandler<T> handler, ExecutionTarget target);
+    /// @deprecated The execution target is ignored, use [#play2Server(CustomPacketPayload.Type, StreamCodec, ServerHandler)].
+    @Deprecated(forRemoval = true)
+    @SuppressWarnings("removal")
+    default <T extends CustomPacketPayload> void play2Server(CustomPacketPayload.Type<T> type, StreamCodec<? super ByteBuf, T> streamCodec, ServerHandler<T> handler, ExecutionTarget target) {
+        play2Server(type, streamCodec, handler);
+    }
 
     /// Registers a custom packet to be sent from the server to the client.
-    /// This will, by default, execute the handler on the main thread, but you can specify a different execution target if needed.
-    default <T extends CustomPacketPayload> void play2Client(CustomPacketPayload.Type<T> type, StreamCodec<? super ByteBuf, T> streamCodec, ClientHandler<T> handler) {
-        play2Client(type, streamCodec, handler, ExecutionTarget.MAIN);
-    }
+    <T extends CustomPacketPayload> void play2Client(CustomPacketPayload.Type<T> type, StreamCodec<? super ByteBuf, T> streamCodec, ClientHandler<T> handler);
 
-    <T extends CustomPacketPayload> void play2Client(CustomPacketPayload.Type<T> type, StreamCodec<? super ByteBuf, T> streamCodec, ClientHandler<T> handler, ExecutionTarget target);
+    /// @deprecated The execution target is ignored, use [#play2Client(CustomPacketPayload.Type, StreamCodec, ClientHandler)].
+    @Deprecated(forRemoval = true)
+    @SuppressWarnings("removal")
+    default <T extends CustomPacketPayload> void play2Client(CustomPacketPayload.Type<T> type, StreamCodec<? super ByteBuf, T> streamCodec, ClientHandler<T> handler, ExecutionTarget target) {
+        play2Client(type, streamCodec, handler);
+    }
 
     /// Registers a custom packet to be sent in both directions.
-    /// This will, by default, execute the handler on the main thread, but you can specify a different execution target if needed.
-    default <T extends CustomPacketPayload> void playBidirectional(CustomPacketPayload.Type<T> type, StreamCodec<? super ByteBuf, T> streamCodec, ClientHandler<T> clientHandler, ServerHandler<T> serverHandler) {
-        playBidirectional(type, streamCodec, clientHandler, serverHandler, ExecutionTarget.MAIN);
-    }
+    <T extends CustomPacketPayload> void playBidirectional(CustomPacketPayload.Type<T> type, StreamCodec<? super ByteBuf, T> streamCodec, ClientHandler<T> clientHandler, ServerHandler<T> serverHandler);
 
-    <T extends CustomPacketPayload> void playBidirectional(CustomPacketPayload.Type<T> type, StreamCodec<? super ByteBuf, T> streamCodec, ClientHandler<T> clientHandler, ServerHandler<T> serverHandler, ExecutionTarget target);
+    /// @deprecated The execution target is ignored, use [#playBidirectional(CustomPacketPayload.Type, StreamCodec, ClientHandler, ServerHandler)].
+    @Deprecated(forRemoval = true)
+    @SuppressWarnings("removal")
+    default <T extends CustomPacketPayload> void playBidirectional(CustomPacketPayload.Type<T> type, StreamCodec<? super ByteBuf, T> streamCodec, ClientHandler<T> clientHandler, ServerHandler<T> serverHandler, ExecutionTarget target) {
+        playBidirectional(type, streamCodec, clientHandler, serverHandler);
+    }
 
     @FunctionalInterface
     interface ServerHandler<T> {
