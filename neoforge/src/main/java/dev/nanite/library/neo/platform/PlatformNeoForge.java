@@ -83,6 +83,6 @@ public class PlatformNeoForge implements Platform {
 
     @Override
     public void sendPacketToAllPlayers(MinecraftServer server, CustomPacketPayload packet) {
-
+        server.getPlayerList().getPlayers().forEach(player -> sendPacketToPlayer(player, packet));
     }
 }
